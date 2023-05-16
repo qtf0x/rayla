@@ -5,8 +5,12 @@ project(my_project)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -O3 -m64 -std=c++17")
+
 set(CMAKE_C_STANDARD 17)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+
+set(CMAKE_C_FLAGS "-Wall -Wextra -O3 -m64 -std=c17")
 
 enable_testing()
 
