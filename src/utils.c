@@ -10,6 +10,8 @@
 
 #include "utils.h"
 
+#include <math.h> // for fabsf
+
 #define EPSILON 1e-6f // small value used to compare floating-point numbers
 
 bool rlFeq(const float a, const float b)

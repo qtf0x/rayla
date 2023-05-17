@@ -11,7 +11,6 @@
 #ifndef RAYLA_UTILS_H
 #define RAYLA_UTILS_H
 
-#include <math.h> // for fabs
 #include <stdbool.h> // for bool
 
 /**
