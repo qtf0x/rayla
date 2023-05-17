@@ -10,7 +10,7 @@ FetchContent_MakeAvailable(googletest)
 
 set(test_target raytest)
 set(test_sources
-        test_copy.cpp
+        test_tuple.cpp
 )
 
 # build the test executable, linking against gtest as well as our mock library
