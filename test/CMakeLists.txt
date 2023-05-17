@@ -8,7 +8,7 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
-set(test_target rayla_tests)
+set(test_target raytest)
 set(test_sources
         test_copy.cpp
 )

@@ -1,0 +1,88 @@
+#!/bin/bash
+
+build_lib="OFF"
+build_tests="OFF"
+build_all=false
+build_release=false
+build_debug=false
+build_sanitized=false
+defaults=true
+
+while getopts 'altrds' OPTION; do
+  case "$OPTION" in
+    a)
+      build_all=true
+      ;;
+    l)
+      build_lib="ON"
+      ;;
+    t)
+      build_tests="ON"
+      build_lib="ON"
+      ;;
+    r)
+      build_release=true
+      defaults=false
+      ;;
+    d)
+      build_debug=true
+      defaults=false
+      ;;
+    s)
+      build_sanitized=true
+      defaults=false
+      ;;
+    ?)
+      echo "script usage: $(basename \$0) [-a] [-l] [-t] [-r] [-d] [-s]" >&2
+      exit 1
+      ;;
+  esac
+done
+
+rm -rf build
+
+if [ "$build_all" = true ] ; then
+
+  cmake -B build/release -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_LIB=ON -DBUILD_TESTS=ON
+  cmake -B build/debug -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_LIB=ON -DBUILD_TESTS=ON
+  cmake -B build/sanitized -DCMAKE_BUILD_TYPE=SANITIZED -DBUILD_LIB=ON -DBUILD_TESTS=ON
+
+  cmake --build build/release
+  cmake --build build/debug
+  cmake --build build/sanitized
+
+  exit 0
+
+fi
+
+if [ "$build_release" = true ] ; then
+
+  cmake -B build/release -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_LIB="$build_lib" -DBUILD_TESTS="$build_tests"
+
+  cmake --build build/release
+
+fi
+
+if [ "$build_debug" = true ] ; then
+
+  cmake -B build/debug -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_LIB="$build_lib" -DBUILD_TESTS="$build_tests"
+
+  cmake --build build/debug
+
+fi
+
+if [ "$build_sanitized" = true ] ; then
+
+  cmake -B build/sanitized -DCMAKE_BUILD_TYPE=SANITIZED -DBUILD_LIB="$build_lib" -DBUILD_TESTS="$build_tests"
+
+  cmake --build build/sanitized
+
+fi
+
+if [ "$defaults" = true ] ; then
+
+  cmake -B build/release -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_LIB="$build_lib" -DBUILD_TESTS="$build_tests"
+
+  cmake --build build/release
+
+fi
