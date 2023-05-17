@@ -27,20 +27,29 @@ bool rlTeq(const struct RLtuple a, const struct RLtuple b)
 	       rlFeq(a.w, b.w);
 }
 
+struct RLtuple rlMakeTuple(const float x, const float y, const float z,
+			   const float w)
+{
+	struct RLtuple tup = { { x }, { y }, { z }, { w } };
+	return tup;
+}
+
 struct RLtuple rlMakePoint(const float x, const float y, const float z)
 {
-	struct RLtuple p = { x, y, z, 1.f };
+	struct RLtuple p = { { x }, { y }, { z }, { 1.f } };
 	return p;
 }
 
 struct RLtuple rlMakeVector(const float x, const float y, const float z)
 {
-	struct RLtuple v = { x, y, z, 0.f };
+	struct RLtuple v = { { x }, { y }, { z }, { 0.f } };
 	return v;
 }
 
 struct RLtuple rlTadd(const struct RLtuple a, const struct RLtuple b)
 {
-	struct RLtuple sum = { a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w };
+	struct RLtuple sum = {
+		{ a.x + b.x }, { a.y + b.y }, { a.z + b.z }, { a.w + b.w }
+	};
 	return sum;
 }

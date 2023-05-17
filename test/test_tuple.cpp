@@ -9,7 +9,7 @@ extern "C" {
 TEST(tuple, wOnePoint)
 {
 	// Given a <- tuple(4.3, -4.2, 3.1, 1.0)
-	struct RLtuple a = { 4.3f, -4.2f, 3.1f, 1.f };
+	auto a{ rlMakeTuple(4.3f, -4.2f, 3.1f, 1.f) };
 
 	// Then a.x = 4.3
 	ASSERT_TRUE(rlFeq(a.x, 4.3f));
@@ -30,7 +30,7 @@ TEST(tuple, wOnePoint)
 TEST(tuple, wZeroVector)
 {
 	// Given a <- tuple(4.3, -4.2, 3.1, 0.0)
-	struct RLtuple a = { 4.3f, -4.2f, 3.1f, 0.f };
+	auto a{ rlMakeTuple(4.3f, -4.2f, 3.1f, 0.f) };
 
 	// Then a.x = 4.3
 	ASSERT_TRUE(rlFeq(a.x, 4.3f));
@@ -51,7 +51,7 @@ TEST(tuple, wZeroVector)
 TEST(tuple, createPoint)
 {
 	// Given p <- point(4, -4, 3)
-	struct RLtuple p = rlMakePoint(4.f, -4.f, 3.f);
+	auto p{ rlMakePoint(4.f, -4.f, 3.f) };
 
 	// Then p = tuple(4, -4, 3, 1)
 	ASSERT_TRUE(rlTeq(p, { 4.f, -4.f, 3.f, 1.f }));
@@ -61,7 +61,7 @@ TEST(tuple, createPoint)
 TEST(tuple, createVector)
 {
 	// Given v <- vector(4, -4, 3)
-	struct RLtuple v = rlMakeVector(4.f, -4.f, 3.f);
+	auto v{ rlMakeVector(4.f, -4.f, 3.f) };
 
 	// Then tuple(4, -4, 3, 0)
 	ASSERT_TRUE(rlTeq(v, { 4.f, -4.f, 3.f, 0.f }));
@@ -71,9 +71,9 @@ TEST(tuple, createVector)
 TEST(tuple, addTuples)
 {
 	// Given a1 <- tuple(3, -2, 5, 1)
-	struct RLtuple a1 = { 3.f, -2.f, 5.f, 1.f };
+	auto a1{ rlMakeTuple(3.f, -2.f, 5.f, 1.f) };
 	// And a2 <- tuple(-2, 3, 1, 0)
-	struct RLtuple a2 = { -2.f, 3.f, 1.f, 0.f };
+	auto a2{ rlMakeTuple(-2.f, 3.f, 1.f, 0.f) };
 
 	// Then a1 + a2 = tuple(1, 1, 5, 1)
 	ASSERT_TRUE(rlTeq(rlTadd(a1, a2), { 1.f, 1.f, 6.f, 1.f }));

@@ -54,15 +54,19 @@ fi
 
 rm -rf build
 
+num_proc=$(($(nproc --all) + 1))
+
+echo "$num_proc"
+
 if [ "$build_all" = true ] ; then
 
   cmake -B build/release -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_EXECUTABLE=ON -DBUILD_LIB=ON -DBUILD_TESTS=ON
   cmake -B build/debug -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_EXECUTABLE=ON -DBUILD_LIB=ON -DBUILD_TESTS=ON
   cmake -B build/sanitized -DCMAKE_BUILD_TYPE=SANITIZED -DBUILD_EXECUTABLE=ON -DBUILD_LIB=ON -DBUILD_TESTS=ON
 
-  cmake --build build/release
-  cmake --build build/debug
-  cmake --build build/sanitized
+  cmake --build build/release --parallel"$num_proc"
+  cmake --build build/debug --parallel"$num_proc"
+  cmake --build build/sanitized --parallel"$num_proc"
 
   exit 0
 
@@ -72,7 +76,7 @@ if [ "$build_release" = true ] ; then
 
   cmake -B build/release -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_EXECUTABLE="$build_executable" -DBUILD_LIB="$build_lib" -DBUILD_TESTS="$build_tests"
 
-  cmake --build build/release
+  cmake --build build/release --parallel"$num_proc"
 
 fi
 
@@ -80,7 +84,7 @@ if [ "$build_debug" = true ] ; then
 
   cmake -B build/debug -DCMAKE_BUILD_TYPE=DEBUG -DBUILD_EXECUTABLE="$build_executable" -DBUILD_LIB="$build_lib" -DBUILD_TESTS="$build_tests"
 
-  cmake --build build/debug
+  cmake --build build/debug --parallel"$num_proc"
 
 fi
 
@@ -88,7 +92,7 @@ if [ "$build_sanitized" = true ] ; then
 
   cmake -B build/sanitized -DCMAKE_BUILD_TYPE=SANITIZED -DBUILD_EXECUTABLE="$build_executable" -DBUILD_LIB="$build_lib" -DBUILD_TESTS="$build_tests"
 
-  cmake --build build/sanitized
+  cmake --build build/sanitized --parallel"$num_proc"
 
 fi
 
@@ -96,6 +100,6 @@ if [ "$defaults" = true ] ; then
 
   cmake -B build/release -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_EXECUTABLE="$build_executable" -DBUILD_LIB="$build_lib" -DBUILD_TESTS="$build_tests"
 
-  cmake --build build/release
+  cmake --build build/release --parallel"$num_proc"
 
 fi

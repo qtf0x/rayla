@@ -18,7 +18,21 @@
  */
 struct RLtuple {
 	// values for all four dimensions
-	float x, y, z, w;
+	union {
+		float x, r;
+	};
+
+	union {
+		float y, g;
+	};
+
+	union {
+		float z, b;
+	};
+
+	union {
+		float w, a;
+	};
 };
 
 /**
@@ -48,6 +62,18 @@ bool rlIsVector(const struct RLtuple tup);
  * @return false tuple elements not equal
  */
 bool rlTeq(const struct RLtuple a, const struct RLtuple b);
+
+/**
+ * @brief Creates a tuple from given elements.
+ * 
+ * @param x first element of tuple
+ * @param y second element of tuple
+ * @param z third element of tuple
+ * @param w fourth element of tuple
+ * @return struct RLtuple tuple constructed from given elements
+ */
+struct RLtuple rlMakeTuple(const float x, const float y, const float z,
+			   const float w);
 
 /**
  * @brief Creates a point tuple from given xyz elements (W component 1).
