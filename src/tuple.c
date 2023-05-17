@@ -27,13 +27,13 @@ bool rlTeq(const struct RLtuple a, const struct RLtuple b)
 	       rlFeq(a.w, b.w);
 }
 
-struct RLtuple rlPoint(const float x, const float y, const float z)
+struct RLtuple rlMakePoint(const float x, const float y, const float z)
 {
 	struct RLtuple p = { x, y, z, 1.f };
 	return p;
 }
 
-struct RLtuple rlVector(const float x, const float y, const float z)
+struct RLtuple rlMakeVector(const float x, const float y, const float z)
 {
 	struct RLtuple v = { x, y, z, 0.f };
 	return v;

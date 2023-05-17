@@ -58,7 +58,7 @@ bool rlTeq(const struct RLtuple a, const struct RLtuple b);
  * @return struct RLtuple point constructed from from given xyz elements and 
  * with a W component of 1
  */
-struct RLtuple rlPoint(const float x, const float y, const float z);
+struct RLtuple rlMakePoint(const float x, const float y, const float z);
 
 /**
  * @brief Creates a vector tuple from given xyz elements (W component 0).
@@ -69,7 +69,7 @@ struct RLtuple rlPoint(const float x, const float y, const float z);
  * @return struct RLtuple vector constructed from from given xyz elements and 
  * with a W component of 0
  */
-struct RLtuple rlVector(const float x, const float y, const float z);
+struct RLtuple rlMakeVector(const float x, const float y, const float z);
 
 /**
  * @brief Performs the element-wise sum of two tuples.

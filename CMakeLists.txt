@@ -28,8 +28,10 @@ set(main_sources
 )
 
 # build both the rayla executable and a mock library to test against
-add_executable(${PROJECT_NAME} src/main.c ${main_sources})
-include_directories(${include_dirs})
+if (BUILD_EXECUTABLE)
+	add_executable(${PROJECT_NAME} src/main.c ${main_sources})
+	include_directories(${include_dirs})
+endif()
 
 if (BUILD_LIB)
 	add_library(${lib_target} SHARED ${main_sources})

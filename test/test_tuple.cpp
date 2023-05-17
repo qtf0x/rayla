@@ -51,7 +51,7 @@ TEST(tuple, wZeroVector)
 TEST(tuple, createPoint)
 {
 	// Given p <- point(4, -4, 3)
-	struct RLtuple p = rlPoint(4.f, -4.f, 3.f);
+	struct RLtuple p = rlMakePoint(4.f, -4.f, 3.f);
 
 	// Then p = tuple(4, -4, 3, 1)
 	ASSERT_TRUE(rlTeq(p, { 4.f, -4.f, 3.f, 1.f }));
@@ -61,7 +61,7 @@ TEST(tuple, createPoint)
 TEST(tuple, createVector)
 {
 	// Given v <- vector(4, -4, 3)
-	struct RLtuple v = rlVector(4.f, -4.f, 3.f);
+	struct RLtuple v = rlMakeVector(4.f, -4.f, 3.f);
 
 	// Then tuple(4, -4, 3, 0)
 	ASSERT_TRUE(rlTeq(v, { 4.f, -4.f, 3.f, 0.f }));
