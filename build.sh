@@ -56,8 +56,6 @@ rm -rf build
 
 num_proc=$(($(nproc --all) + 1))
 
-echo "$num_proc"
-
 if [ "$build_all" = true ] ; then
 
   cmake -B build/release -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_EXECUTABLE=ON -DBUILD_LIB=ON -DBUILD_TESTS=ON
