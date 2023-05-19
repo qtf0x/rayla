@@ -8,8 +8,10 @@
  * @brief Implementations for tuple.h functions.
  */
 
+#include <math.h> // for sqrtf
+
 #include "tuple.h"
-#include "utils.h" // for rlFeq
+#include "rl_utils.h" // for rlFeq
 
 bool rlIsPoint(const struct RLtuple tup)
 {
@@ -34,9 +36,21 @@ struct RLtuple rlMakeTuple(const float x, const float y, const float z,
 	return tup;
 }
 
+struct RLtuple rlMakeTuple1(const float x)
+{
+	struct RLtuple tup = { { x }, { x }, { x }, { x } };
+	return tup;
+}
+
 struct RLtuple rlMakePoint(const float x, const float y, const float z)
 {
 	struct RLtuple p = { { x }, { y }, { z }, { 1.f } };
+	return p;
+}
+
+struct RLtuple rlMakePoint1(const float x)
+{
+	struct RLtuple p = { { x }, { x }, { x }, { 1.f } };
 	return p;
 }
 
@@ -46,10 +60,48 @@ struct RLtuple rlMakeVector(const float x, const float y, const float z)
 	return v;
 }
 
+struct RLtuple rlMakeVector1(const float x)
+{
+	struct RLtuple v = { { x }, { x }, { x }, { 0.f } };
+	return v;
+}
+
 struct RLtuple rlTadd(const struct RLtuple a, const struct RLtuple b)
 {
 	struct RLtuple sum = {
 		{ a.x + b.x }, { a.y + b.y }, { a.z + b.z }, { a.w + b.w }
 	};
 	return sum;
+}
+
+struct RLtuple rlTsub(const struct RLtuple a, const struct RLtuple b)
+{
+	struct RLtuple diff = {
+		{ a.x - b.x }, { a.y - b.y }, { a.z - b.z }, { a.w - b.w }
+	};
+	return diff;
+}
+
+struct RLtuple rlTneg(const struct RLtuple tup)
+{
+	struct RLtuple neg = { { -tup.x }, { -tup.y }, { -tup.z }, { -tup.w } };
+	return neg;
+}
+
+struct RLtuple rlFTmul(const float scl, const struct RLtuple tup)
+{
+	struct RLtuple prod = { { scl * tup.x },
+				{ scl * tup.y },
+				{ scl * tup.z },
+				{ scl * tup.w } };
+	return prod;
+}
+
+float rlTmag(const struct RLtuple v)
+{
+	if (!rlFeq(v.w, 0.f)) // points do not have magnitude
+		return 0.f;
+
+	// pythagorean theorem
+	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 }

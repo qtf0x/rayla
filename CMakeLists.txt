@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25.1)
+cmake_minimum_required(VERSION 3.26.3)
 project(rayla VERSION 0.0.1 DESCRIPTION "ray tracing library")
 
 # GoogleTest requires at least C++14
@@ -24,7 +24,7 @@ set(lib_target raylib)
 set(include_dirs include)
 set(main_sources
 		src/tuple.c
-		src/utils.c
+		src/rl_utils.c
 )
 
 # build both the rayla executable and a mock library to test against

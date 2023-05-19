@@ -76,6 +76,14 @@ struct RLtuple rlMakeTuple(const float x, const float y, const float z,
 			   const float w);
 
 /**
+ * @brief Creates a tuple whose elements are all equal to the argument given.
+ * 
+ * @param x value for all elements of tuple
+ * @return struct RLtuple tuple constructed from given element
+ */
+struct RLtuple rlMakeTuple1(const float x);
+
+/**
  * @brief Creates a point tuple from given xyz elements (W component 1).
  * 
  * @param x first element of point
@@ -87,23 +95,77 @@ struct RLtuple rlMakeTuple(const float x, const float y, const float z,
 struct RLtuple rlMakePoint(const float x, const float y, const float z);
 
 /**
+ * @brief Creates a point tuple whose xyz elements are all equal to the 
+ * argument given.
+ * 
+ * @param x value for xyz elements of point
+ * @return struct RLtuple point constructed from given element and with a W 
+ * component of 1
+ */
+struct RLtuple rlMakePoint1(const float x);
+
+/**
  * @brief Creates a vector tuple from given xyz elements (W component 0).
  * 
  * @param x first element of vector
  * @param y second element of vector
  * @param z third element of vector
- * @return struct RLtuple vector constructed from from given xyz elements and 
+ * @return struct RLtuple vector constructed from given xyz elements and 
  * with a W component of 0
  */
 struct RLtuple rlMakeVector(const float x, const float y, const float z);
 
 /**
- * @brief Performs the element-wise sum of two tuples.
+ * @brief Creates a vector tuple whose xyz elements are all equal to the 
+ * arguemtn given.
  * 
- * @param a first tuple to add
- * @param b second tuple to add
+ * @param x value for xyz elements of point
+ * @return struct RLtuple vector constructed from given element element and 
+ * with a W component of 0
+ */
+struct RLtuple rlMakeVector1(const float x);
+
+/**
+ * @brief Calculates element-wise sum of two tuples.
+ * 
+ * @param a augend (first tuple to add)
+ * @param b append (second tuple to add)
  * @return struct RLtuple element-wise sum of a and b
  */
 struct RLtuple rlTadd(const struct RLtuple a, const struct RLtuple b);
+
+/**
+ * @brief Calculates element-wise difference of two tuples.
+ * 
+ * @param a minuend (tuple to subtract from)
+ * @param b subtrahend (tuple to subtract)
+ * @return struct RLtuple element-wise difference of a and b
+ */
+struct RLtuple rlTsub(const struct RLtuple a, const struct RLtuple b);
+
+/**
+ * @brief Negates a tuple.
+ * 
+ * @param tup tuple to negate
+ * @return struct RLtuple all elements negated
+ */
+struct RLtuple rlTneg(const struct RLtuple tup);
+
+/**
+ * @brief Calculates element-wise multiplication of a tuple by a scalar.
+ * 
+ * @param scl multiplier
+ * @param tup multiplicand
+ * @return struct RLtuple element-wise product of tup by scl
+ */
+struct RLtuple rlFTmul(const float scl, const struct RLtuple tup);
+
+/**
+ * @brief Computes the magnitude of a given vector.
+ * 
+ * @param v vector to find the magnitude of
+ * @return float magnitude of the vector (0 if v is a point)
+ */
+float rlTmag(const struct RLtuple v);
 
 #endif // RAYLA_TUPLE_H

@@ -8,7 +8,7 @@
  * @brief Implementations for utils.h functions.
  */
 
-#include "utils.h"
+#include "rl_utils.h"
 
 #include <math.h> // for fabsf
 
