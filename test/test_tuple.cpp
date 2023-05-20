@@ -1,3 +1,5 @@
+#include <cmath> // for sqrtf
+
 #include <gtest/gtest.h>
 
 extern "C" {
@@ -160,11 +162,87 @@ TEST(tuple, multiplyTupleByFraction)
 }
 
 // Scenario: Computing the magnitude of vector(1, 0, 0)
-TEST(tuple, magnitudeOfNormalVec1)
+TEST(tuple, magnitudeOfNormalVec0)
 {
 	// Given v <- vector(1, 0, 0)
 	auto v{ rlMakeVector(1.f, 0.f, 0.f) };
 
 	// Then magnitude(v) = 1
 	ASSERT_TRUE(rlFeq(rlTmag(v), 1.f));
+}
+
+// Scenario: Computing the magnitude of vector(0, 1, 0)
+TEST(tuple, magnitudeOfNormalVec1)
+{
+	// Given v <- vector(0, 1, 0)
+	auto v{ rlMakeVector(0.f, 1.f, 0.f) };
+
+	// Then magnitude(v) = 1
+	ASSERT_TRUE(rlFeq(rlTmag(v), 1.f));
+}
+
+// Scenario: Computing the magnitude of vector(0, 0, 1)
+TEST(tuple, magnitudeOfNormalVec2)
+{
+	// Given v <- vector(0, 0, 1)
+	auto v{ rlMakeVector(0.f, 0.f, 1.f) };
+
+	// Then magnitude(v) = 1
+	ASSERT_TRUE(rlFeq(rlTmag(v), 1.f));
+}
+
+// Scenario: Computing the magnitude of vector(1, 2, 3)
+TEST(tuple, magnitudeOfVec0)
+{
+	// Given v <- vector(1, 2, 3)
+	auto v{ rlMakeVector(1.f, 2.f, 3.f) };
+
+	// Then magnitude(v) = sqrt(14)
+	ASSERT_TRUE(rlFeq(rlTmag(v), sqrtf(14.f)));
+}
+
+// Scenario: Computing the magnitude of vector(-1, -2, -3)
+TEST(tuple, magnitudeOfVec1)
+{
+	// Given v <- vector(-1, -2, -3)
+	auto v{ rlMakeVector(-1.f, -2.f, -3.f) };
+
+	// Then magnitude(v) = sqrt(14)
+	ASSERT_TRUE(rlFeq(rlTmag(v), sqrtf(14.f)));
+}
+
+// Scenario: Normalizing vector(4, 0, 0) gives (1, 0, 0)
+TEST(tuple, normalizeVec0)
+{
+	// Given v <- vector(4, 0, 0)
+	auto v{ rlMakeVector(4.f, 0.f, 0.f) };
+
+	// Then normalize(v) = vector(1, 0, 0)
+	ASSERT_TRUE(rlTeq(rlTnrm(v), rlMakeVector(1.f, 0.f, 0.f)));
+}
+
+// Scenario: Normalizing vector(1, 2, 3)
+TEST(tuple, normalizeVec1)
+{
+	// Given v <- vector(1, 2, 3)
+	auto v{ rlMakeVector(1.f, 2.f, 3.f) };
+
+	auto mag{ sqrtf(14.f) };
+
+	// Then normalize(v) = vector(1/sqrt(14), 2/sqrt(14), 3/sqrt(14))
+	ASSERT_TRUE(rlTeq(rlTnrm(v),
+			  rlMakeVector(1.f / mag, 2.f / mag, 3.f / mag)));
+}
+
+// Scenario: The magnitude of a normalized vector
+TEST(tuple, magnitudeOfNormalVec)
+{
+	// Given v <- vector(1, 2, 3)
+	auto v{ rlMakeVector(1.f, 2.f, 3.f) };
+
+	// When norm <- normalize(v)
+	auto norm{ rlTnrm(v) };
+
+	// Then magnitude(norm) = 1
+	ASSERT_TRUE(rlFeq(rlTmag(norm), 1.f));
 }

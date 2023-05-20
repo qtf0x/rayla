@@ -164,8 +164,17 @@ struct RLtuple rlFTmul(const float scl, const struct RLtuple tup);
  * @brief Computes the magnitude of a given vector.
  * 
  * @param v vector to find the magnitude of
- * @return float magnitude of the vector (0 if v is a point)
+ * @return float magnitude of the vector
  */
 float rlTmag(const struct RLtuple v);
+
+/**
+ * @brief Normalizes a tuple. That is, constructs a vector of magnitude 1 and 
+ * in the direction of the tuple argument passed in.
+ * 
+ * @param tup tuple to normalize
+ * @return struct RLtuple normal vector in direction of tup
+ */
+struct RLtuple rlTnrm(const struct RLtuple tup);
 
 #endif // RAYLA_TUPLE_H
