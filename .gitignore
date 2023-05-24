@@ -1,4 +1,5 @@
 build/
+.vscode/
 
 # Below is concatenated from various files in https://github.com/github/gitignore
 

@@ -12,9 +12,10 @@
 
 #include <math.h> // for fabsf
 
-#define EPSILON 1e-6f // small value used to compare floating-point numbers
+// small value used to compare floating-point numbers
+static const float EPSILON = 1e-6f;
 
-bool rlFeq(const float a, const float b)
+bool feq(const float a, const float b)
 {
 	return fabsf(a - b) < EPSILON;
 }

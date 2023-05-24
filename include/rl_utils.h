@@ -11,7 +11,15 @@
 #ifndef RAYLA_UTILS_H
 #define RAYLA_UTILS_H
 
+// blurb for inclusion into C++ translation units
+#ifdef __cplusplus
+extern "C" {
+
+// this header does (virtually) nothing in C++; don't need it
+#else
 #include <stdbool.h> // for bool
+
+#endif // __cplusplus
 
 /**
  * @brief Compares two floating-point values for equality.
@@ -21,6 +29,10 @@
  * @return true values "close-enough" to equal
  * @return false values not equal
  */
-bool rlFeq(const float a, const float b);
+bool feq(const float a, const float b);
+
+#ifdef __cplusplus
+}
+#endif // __cplusplus
 
 #endif //RAYLA_UTILS_H

@@ -2,10 +2,8 @@
 
 #include <gtest/gtest.h>
 
-extern "C" {
-#include "tuple.h"
+#include "vec4.h"
 #include "rl_utils.h"
-}
 
 // Scenario: A tuple with w=1.0 is a point
 TEST(tuple, wOnePoint)
