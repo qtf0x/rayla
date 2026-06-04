@@ -2,8 +2,8 @@ fn main() {
     let v = Vector::new(1.0, -2.0, 3.0);
     let p = Point::new(-3.0, 2.0, -1.0);
 
-    println!("Here's a vector: {:?}", Tuple::from(v));
-    println!("Here's a point:  {:?}", Tuple::from(p));
+    println!("Here's a vector: {:?}", Tuple::from(&v));
+    println!("Here's a point:  {:?}", Tuple::from(&p));
 }
 
 fn flt_approx_eq(f1: f64, f2: f64) -> bool {
@@ -33,14 +33,14 @@ impl PartialEq for Tuple {
     }
 }
 
-impl From<Point> for Tuple {
-    fn from(p: Point) -> Self {
+impl From<&Point> for Tuple {
+    fn from(p: &Point) -> Self {
         Self::new(p.x, p.y, p.z, 1.0)
     }
 }
 
-impl From<Vector> for Tuple {
-    fn from(p: Vector) -> Self {
+impl From<&Vector> for Tuple {
+    fn from(p: &Vector) -> Self {
         Self::new(p.x, p.y, p.z, 0.0)
     }
 }
@@ -146,13 +146,13 @@ mod tests {
     fn create_a_point() {
         let p = Point::new(4.0, -4.0, 3.0);
 
-        assert_eq!(Tuple::from(p), Tuple::new(4.0, -4.0, 3.0, 1.0));
+        assert_eq!(Tuple::from(&p), Tuple::new(4.0, -4.0, 3.0, 1.0));
     }
 
     #[test]
     fn create_a_vector() {
         let v = Vector::new(4.0, -4.0, 3.0);
 
-        assert_eq!(Tuple::from(v), Tuple::new(4.0, -4.0, 3.0, 0.0));
+        assert_eq!(Tuple::from(&v), Tuple::new(4.0, -4.0, 3.0, 0.0));
     }
 }
