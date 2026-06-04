@@ -1,8 +1,10 @@
+use std::ops::{Add, Sub};
+
 fn flt_approx_eq(f1: f64, f2: f64) -> bool {
     (f1 - f2).abs() < 1.0E-6
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Tuple {
     x: f64,
     y: f64,
@@ -28,6 +30,32 @@ impl PartialEq for Tuple {
             && flt_approx_eq(self.y, other.y)
             && flt_approx_eq(self.z, other.z)
             && flt_approx_eq(self.w, other.w)
+    }
+}
+
+impl Add for Tuple {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        Self::Output {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+            w: self.w + other.w,
+        }
+    }
+}
+
+impl Sub for Tuple {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self::Output {
+        Self::Output {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+            w: self.w - other.w,
+        }
     }
 }
 
