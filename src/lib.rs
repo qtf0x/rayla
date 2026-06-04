@@ -1,4 +1,4 @@
-use std::ops::{Add, Sub};
+use std::ops::{Add, Neg, Sub};
 
 fn flt_approx_eq(f1: f64, f2: f64) -> bool {
     (f1 - f2).abs() < 1.0E-6
@@ -59,14 +59,27 @@ impl Sub for Tuple {
     }
 }
 
-impl From<&Point> for Tuple {
-    fn from(p: &Point) -> Self {
+impl Neg for Tuple {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self::Output {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+            w: -self.w,
+        }
+    }
+}
+
+impl From<Point> for Tuple {
+    fn from(p: Point) -> Self {
         Self::new(p.x, p.y, p.z, 1.0)
     }
 }
 
-impl From<&Vector> for Tuple {
-    fn from(p: &Vector) -> Self {
+impl From<Vector> for Tuple {
+    fn from(p: Vector) -> Self {
         Self::new(p.x, p.y, p.z, 0.0)
     }
 }
@@ -139,10 +152,22 @@ impl Sub<Vector> for Point {
     }
 }
 
-impl TryFrom<&Tuple> for Point {
+impl Neg for Point {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self::Output {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
+impl TryFrom<Tuple> for Point {
     type Error = TupleConversionError;
 
-    fn try_from(t: &Tuple) -> Result<Self, Self::Error> {
+    fn try_from(t: Tuple) -> Result<Self, Self::Error> {
         if flt_approx_eq(t.w, 1.0) {
             Ok(Self::new(t.x, t.y, t.z))
         } else {
@@ -202,6 +227,18 @@ impl Sub for Vector {
     }
 }
 
+impl Neg for Vector {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        Self::Output {
+            x: -self.x,
+            y: -self.y,
+            z: -self.z,
+        }
+    }
+}
+
 impl Add<Point> for Vector {
     type Output = Point;
 
@@ -214,10 +251,10 @@ impl Add<Point> for Vector {
     }
 }
 
-impl TryFrom<&Tuple> for Vector {
+impl TryFrom<Tuple> for Vector {
     type Error = TupleConversionError;
 
-    fn try_from(t: &Tuple) -> Result<Self, Self::Error> {
+    fn try_from(t: Tuple) -> Result<Self, Self::Error> {
         if flt_approx_eq(t.w, 0.0) {
             Ok(Self::new(t.x, t.y, t.z))
         } else {
@@ -239,8 +276,8 @@ mod tests {
         assert_eq!(a.z, 3.1);
         assert_eq!(a.w, 1.0);
 
-        std::assert_matches!(Point::try_from(&a), Ok(_));
-        std::assert_matches!(Vector::try_from(&a), Err(_));
+        std::assert_matches!(Point::try_from(a), Ok(_));
+        std::assert_matches!(Vector::try_from(a), Err(_));
     }
 
     #[test]
@@ -252,14 +289,14 @@ mod tests {
         assert_eq!(a.z, 3.1);
         assert_eq!(a.w, 0.0);
 
-        std::assert_matches!(Point::try_from(&a), Err(_));
-        std::assert_matches!(Vector::try_from(&a), Ok(_));
+        std::assert_matches!(Point::try_from(a), Err(_));
+        std::assert_matches!(Vector::try_from(a), Ok(_));
     }
 
     #[test]
     fn create_a_point() {
         assert_eq!(
-            Tuple::from(&Point::new(4.0, -4.0, 3.0)),
+            Tuple::from(Point::new(4.0, -4.0, 3.0)),
             Tuple::new(4.0, -4.0, 3.0, 1.0)
         );
     }
@@ -268,7 +305,7 @@ mod tests {
     fn create_a_vector() {
         let v = Vector::new(4.0, -4.0, 3.0);
 
-        assert_eq!(Tuple::from(&v), Tuple::new(4.0, -4.0, 3.0, 0.0));
+        assert_eq!(Tuple::from(v), Tuple::new(4.0, -4.0, 3.0, 0.0));
     }
 
     #[test]
@@ -338,26 +375,20 @@ mod tests {
 
     #[test]
     fn negate_tuple() {
-        let t = -Tuple::new(1.0, -2.0, 3.0, -4.0);
-
-        assert_eq!(t, Tuple::new(-1.0, 2.0, -3.0, 4.0));
-        assert_eq!(t, Tuple::default() - t);
+        assert_eq!(
+            -Tuple::new(1.0, -2.0, 3.0, -4.0),
+            Tuple::new(-1.0, 2.0, -3.0, 4.0)
+        );
     }
 
     #[test]
     fn negate_point() {
-        let p = -Point::new(1.0, -2.0, 3.0);
-
-        assert_eq!(p, Point::new(-1.0, 2.0, -3.0));
-        assert_eq!(p, Point::default() - p);
+        assert_eq!(-Point::new(1.0, -2.0, 3.0), Point::new(-1.0, 2.0, -3.0));
     }
 
     #[test]
     fn negate_vector() {
-        let v = -Vector::new(1.0, -2.0, 3.0);
-
-        assert_eq!(v, Vector::new(-1.0, 2.0, -3.0));
-        assert_eq!(v, Vector::default() - v);
+        assert_eq!(-Vector::new(1.0, -2.0, 3.0), Vector::new(-1.0, 2.0, -3.0));
     }
 }
 
