@@ -152,18 +152,6 @@ impl Sub<Vector> for Point {
     }
 }
 
-impl Neg for Point {
-    type Output = Self;
-
-    fn neg(self) -> Self::Output {
-        Self::Output {
-            x: -self.x,
-            y: -self.y,
-            z: -self.z,
-        }
-    }
-}
-
 impl TryFrom<Tuple> for Point {
     type Error = TupleConversionError;
 
@@ -382,11 +370,6 @@ mod tests {
     }
 
     #[test]
-    fn negate_point() {
-        assert_eq!(-Point::new(1.0, -2.0, 3.0), Point::new(-1.0, 2.0, -3.0));
-    }
-
-    #[test]
     fn negate_vector() {
         assert_eq!(-Vector::new(1.0, -2.0, 3.0), Vector::new(-1.0, 2.0, -3.0));
     }
@@ -443,6 +426,11 @@ mod doctests {
     /// Vector::new(5.0, 6.0, 7.0) - Point::new(3.0, 2.0, 1.0);
     /// ```
     fn _subtract_point_from_vector() {}
+
+    /// ```compile_fail,E0600
+    /// -Point::new(1.0, -2.0, 3.0);
+    /// ```
+    fn _negate_point() {}
 
     /// ```compile_fail,E0369
     /// let p = Point::new(1.0, 2.0, 3.0);
