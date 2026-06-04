@@ -335,6 +335,30 @@ mod tests {
         assert_eq!(v1 - v2, Vector::new(-2.0, -4.0, -6.0));
         assert_eq!(v2 - v1, Vector::new(2.0, 4.0, 6.0));
     }
+
+    #[test]
+    fn negate_tuple() {
+        let t = -Tuple::new(1.0, -2.0, 3.0, -4.0);
+
+        assert_eq!(t, Tuple::new(-1.0, 2.0, -3.0, 4.0));
+        assert_eq!(t, Tuple::default() - t);
+    }
+
+    #[test]
+    fn negate_point() {
+        let p = -Point::new(1.0, -2.0, 3.0);
+
+        assert_eq!(p, Point::new(-1.0, 2.0, -3.0));
+        assert_eq!(p, Point::default() - p);
+    }
+
+    #[test]
+    fn negate_vector() {
+        let v = -Vector::new(1.0, -2.0, 3.0);
+
+        assert_eq!(v, Vector::new(-1.0, 2.0, -3.0));
+        assert_eq!(v, Vector::default() - v);
+    }
 }
 
 #[cfg(doctest)]
