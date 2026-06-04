@@ -493,28 +493,39 @@ mod tests {
 #[cfg(doctest)]
 mod doctests {
     /// ```compile_fail,E0369
+    /// use rayla::*;
+    ///
     /// Point::new(12.0, -24.1, 48.2) + Point::new(-12.0, 24.1, -48.2);
     /// ```
     fn _add_points() {}
 
     /// ```compile_fail,E0369
+    /// use rayla::*;
+    ///
     /// Vector::new(5.0, 6.0, 7.0) - Point::new(3.0, 2.0, 1.0);
     /// ```
     fn _subtract_point_from_vector() {}
 
     /// ```compile_fail,E0600
+    /// use rayla::*;
+    ///
     /// -Point::new(1.0, -2.0, 3.0);
     /// ```
     fn _negate_point() {}
 
     /// ```compile_fail,E0369
+    /// use rayla::*;
+    ///
     /// let p = Point::new(1.0, 2.0, 3.0);
+    ///
     /// p * 3.5;
     /// 3.5 * p;
     /// ```
     fn _scale_multiply_points() {}
 
     /// ```compile_fail,E0369
+    /// use rayla::*;
+    ///
     /// Point::new(1.0, 2.0, 3.0) / 2.0;
     /// ```
     fn _scale_divide_points() {}
