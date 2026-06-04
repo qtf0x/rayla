@@ -390,6 +390,46 @@ mod tests {
     fn negate_vector() {
         assert_eq!(-Vector::new(1.0, -2.0, 3.0), Vector::new(-1.0, 2.0, -3.0));
     }
+
+    #[test]
+    fn scale_multiply_tuples() {
+        let t = Tuple::new(1.0, -2.0, 3.0, -4.0);
+        let res_bigger = Tuple::new(3.5, -7.0, 10.5, -14.0);
+        let res_smaller = Tuple::new(0.5, -1.0, 1.5, -2.0);
+
+        assert_eq!(t * 3.5, res_bigger);
+        assert_eq!(3.5 * t, res_bigger);
+        assert_eq!(t * 0.5, res_smaller);
+        assert_eq!(0.5 * t, res_smaller);
+    }
+
+    #[test]
+    fn scale_multiply_vectors() {
+        let v = Vector::new(1.0, -2.0, 3.0);
+        let res_bigger = Vector::new(3.5, -7.0, 10.5);
+        let res_smaller = Vector::new(0.5, -1.0, 1.5);
+
+        assert_eq!(v * 3.5, res_bigger);
+        assert_eq!(3.5 * v, res_bigger);
+        assert_eq!(v * 0.5, res_smaller);
+        assert_eq!(0.5 * v, res_smaller);
+    }
+
+    #[test]
+    fn scale_divide_tuples() {
+        assert_eq!(
+            Tuple::new(1.0, -2.0, 3.0, -4.0) / 2.0,
+            Tuple::new(0.5, -1.0, 1.5, -2.0)
+        );
+    }
+
+    #[test]
+    fn scale_divide_vectors() {
+        assert_eq!(
+            Vector::new(1.0, -2.0, 3.0) / 2.0,
+            Vector::new(0.5, -1.0, 1.5)
+        );
+    }
 }
 
 #[cfg(doctest)]
@@ -403,4 +443,16 @@ mod doctests {
     /// Vector::new(5.0, 6.0, 7.0) - Point::new(3.0, 2.0, 1.0);
     /// ```
     fn _subtract_point_from_vector() {}
+
+    /// ```compile_fail,E0369
+    /// let p = Point::new(1.0, 2.0, 3.0);
+    /// p * 3.5;
+    /// 3.5 * p;
+    /// ```
+    fn _scale_multiply_points() {}
+
+    /// ```compile_fail,E0369
+    /// Point::new(1.0, 2.0, 3.0) / 2.0;
+    /// ```
+    fn _scale_divide_points() {}
 }
