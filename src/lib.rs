@@ -4,7 +4,7 @@ fn flt_approx_eq(f1: f64, f2: f64) -> bool {
     (f1 - f2).abs() < 1.0E-6
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Clone, Copy, Debug)]
 pub struct Tuple {
     x: f64,
     y: f64,
@@ -76,7 +76,7 @@ pub enum TupleConversionError {
     BadWValue,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Point {
     x: f64,
     y: f64,
@@ -95,6 +95,50 @@ impl Default for Point {
     }
 }
 
+impl PartialEq for Point {
+    fn eq(&self, other: &Self) -> bool {
+        flt_approx_eq(self.x, other.x)
+            && flt_approx_eq(self.y, other.y)
+            && flt_approx_eq(self.z, other.z)
+    }
+}
+
+impl Sub for Point {
+    type Output = Vector;
+
+    fn sub(self, other: Self) -> Self::Output {
+        Self::Output {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+        }
+    }
+}
+
+impl Add<Vector> for Point {
+    type Output = Self;
+
+    fn add(self, rhs: Vector) -> Self::Output {
+        Self::Output {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        }
+    }
+}
+
+impl Sub<Vector> for Point {
+    type Output = Self;
+
+    fn sub(self, rhs: Vector) -> Self::Output {
+        Self::Output {
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+        }
+    }
+}
+
 impl TryFrom<&Tuple> for Point {
     type Error = TupleConversionError;
 
@@ -107,7 +151,7 @@ impl TryFrom<&Tuple> for Point {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct Vector {
     x: f64,
     y: f64,
@@ -123,6 +167,50 @@ impl Vector {
 impl Default for Vector {
     fn default() -> Self {
         Self::new(0.0, 0.0, 0.0)
+    }
+}
+
+impl PartialEq for Vector {
+    fn eq(&self, other: &Self) -> bool {
+        flt_approx_eq(self.x, other.x)
+            && flt_approx_eq(self.y, other.y)
+            && flt_approx_eq(self.z, other.z)
+    }
+}
+
+impl Add for Vector {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self::Output {
+        Self::Output {
+            x: self.x + other.x,
+            y: self.y + other.y,
+            z: self.z + other.z,
+        }
+    }
+}
+
+impl Sub for Vector {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self::Output {
+        Self::Output {
+            x: self.x - other.x,
+            y: self.y - other.y,
+            z: self.z - other.z,
+        }
+    }
+}
+
+impl Add<Point> for Vector {
+    type Output = Point;
+
+    fn add(self, rhs: Point) -> Self::Output {
+        Self::Output {
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+        }
     }
 }
 
