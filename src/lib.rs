@@ -516,12 +516,16 @@ mod doctests {
     /// ```compile_fail,E0369
     /// use rayla::*;
     ///
-    /// let p = Point::new(1.0, 2.0, 3.0);
-    ///
-    /// p * 3.5;
-    /// 3.5 * p;
+    /// Point::new(1.0, 2.0, 3.0) * 3.5;
     /// ```
-    fn _scale_multiply_points() {}
+    fn _multiply_point_by_scalar() {}
+
+    /// ```compile_fail,E0369
+    /// use rayla::*;
+    ///
+    /// 3.5 * Point::new(1.0, 2.0, 3.0);
+    /// ```
+    fn _multiply_scalar_by_point() {}
 
     /// ```compile_fail,E0369
     /// use rayla::*;
