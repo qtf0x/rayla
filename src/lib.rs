@@ -16,6 +16,12 @@ impl Tuple {
     }
 }
 
+impl Default for Tuple {
+    fn default() -> Self {
+        Self::new(0.0, 0.0, 0.0, 0.0)
+    }
+}
+
 impl PartialEq for Tuple {
     fn eq(&self, other: &Self) -> bool {
         flt_approx_eq(self.x, other.x)
@@ -136,9 +142,10 @@ mod tests {
 
     #[test]
     fn create_a_point() {
-        let p = Point::new(4.0, -4.0, 3.0);
-
-        assert_eq!(Tuple::from(&p), Tuple::new(4.0, -4.0, 3.0, 1.0));
+        assert_eq!(
+            Tuple::from(&Point::new(4.0, -4.0, 3.0)),
+            Tuple::new(4.0, -4.0, 3.0, 1.0)
+        );
     }
 
     #[test]
@@ -147,4 +154,82 @@ mod tests {
 
         assert_eq!(Tuple::from(&v), Tuple::new(4.0, -4.0, 3.0, 0.0));
     }
+
+    #[test]
+    fn add_tuples() {
+        let t1 = Tuple::new(1.4, -9.16, 25.36, -49.64);
+        let t2 = Tuple::new(-1.4, 9.16, -25.36, 49.64);
+        let res = Tuple::default();
+
+        assert_eq!(t1 + t2, res);
+        assert_eq!(t2 + t1, res);
+    }
+
+    #[test]
+    fn add_vectors() {
+        let v1 = Vector::new(7.2, -1000.0, 0.0);
+        let v2 = Vector::new(0.0004, 100.001, -12.5);
+        let res = Vector::new(7.2004, -899.999, -12.5);
+
+        assert_eq!(v1 + v2, res);
+        assert_eq!(v2 + v1, res);
+    }
+
+    #[test]
+    fn add_vectors_to_points() {
+        let p = Point::new(9.0, 3.1415, 0.01);
+        let v = Vector::new(1.0, -1.0, 14.3);
+        let res = Point::new(10.0, 2.1415, 14.31);
+
+        assert_eq!(p + v, res);
+        assert_eq!(v + p, res);
+    }
+
+    #[test]
+    fn subtract_tuples() {
+        let t1 = Tuple::new(1.4, -9.16, 25.36, -49.64);
+        let t2 = Tuple::new(-1.4, 9.16, -25.36, 49.64);
+
+        assert_eq!(t1 - t2, Tuple::new(2.8, -18.32, 50.72, -99.28));
+        assert_eq!(t2 - t1, Tuple::new(-2.8, 18.32, -50.72, 99.28));
+    }
+
+    #[test]
+    fn subtract_points() {
+        let p1 = Point::new(3.0, 2.0, 1.0);
+        let p2 = Point::new(5.0, 6.0, 7.0);
+
+        assert_eq!(p1 - p2, Vector::new(-2.0, -4.0, -6.0));
+        assert_eq!(p2 - p1, Vector::new(2.0, 4.0, 6.0));
+    }
+
+    #[test]
+    fn subtract_vector_from_point() {
+        assert_eq!(
+            Point::new(3.0, 2.0, 1.0) - Vector::new(5.0, 6.0, 7.0),
+            Point::new(-2.0, -4.0, -6.0)
+        );
+    }
+
+    #[test]
+    fn subtract_vectors() {
+        let v1 = Vector::new(3.0, 2.0, 1.0);
+        let v2 = Vector::new(5.0, 6.0, 7.0);
+
+        assert_eq!(v1 - v2, Vector::new(-2.0, -4.0, -6.0));
+        assert_eq!(v2 - v1, Vector::new(2.0, 4.0, 6.0));
+    }
+}
+
+#[cfg(doctest)]
+mod doctests {
+    /// ```compile_fail,E0369
+    /// Point::new(12.0, -24.1, 48.2) + Point::new(-12.0, 24.1, -48.2);
+    /// ```
+    fn _add_points() {}
+
+    /// ```compile_fail,E0369
+    /// Vector::new(5.0, 6.0, 7.0) - Point::new(3.0, 2.0, 1.0);
+    /// ```
+    fn _subtract_point_from_vector() {}
 }
