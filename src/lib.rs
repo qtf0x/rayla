@@ -470,6 +470,18 @@ mod tests {
             Vector::new(0.5, -1.0, 1.5)
         );
     }
+
+    #[test]
+    fn vector_magnitudes() {
+        assert!(flt_approx_eq(Vector::new(1.0, 0.0, 0.0).len(), 1.0));
+        assert!(flt_approx_eq(Vector::new(0.0, 1.0, 0.0).len(), 1.0));
+        assert!(flt_approx_eq(Vector::new(0.0, 0.0, 1.0).len(), 1.0));
+        assert!(flt_approx_eq(Vector::new(1.0, 2.0, 3.0).len(), 14.0.sqrt()));
+        assert!(flt_approx_eq(
+            Vector::new(-1.0, -2.0, -3.0).len(),
+            14.0.sqrt()
+        ));
+    }
 }
 
 #[cfg(doctest)]
