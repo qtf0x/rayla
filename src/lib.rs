@@ -4,7 +4,7 @@ fn flt_approx_eq(f1: f64, f2: f64) -> bool {
     (f1 - f2).abs() < 1.0E-6
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Tuple {
     x: f64,
     y: f64,
@@ -15,12 +15,6 @@ pub struct Tuple {
 impl Tuple {
     fn new(x: f64, y: f64, z: f64, w: f64) -> Self {
         Self { x, y, z, w }
-    }
-}
-
-impl Default for Tuple {
-    fn default() -> Self {
-        Self::new(0.0, 0.0, 0.0, 0.0)
     }
 }
 
@@ -128,7 +122,7 @@ pub enum TupleConversionError {
     BadWValue,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Point {
     x: f64,
     y: f64,
@@ -138,12 +132,6 @@ pub struct Point {
 impl Point {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
-    }
-}
-
-impl Default for Point {
-    fn default() -> Self {
-        Self::new(0.0, 0.0, 0.0)
     }
 }
 
@@ -203,7 +191,7 @@ impl TryFrom<Tuple> for Point {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Vector {
     x: f64,
     y: f64,
@@ -213,12 +201,6 @@ pub struct Vector {
 impl Vector {
     pub fn new(x: f64, y: f64, z: f64) -> Self {
         Self { x, y, z }
-    }
-}
-
-impl Default for Vector {
-    fn default() -> Self {
-        Self::new(0.0, 0.0, 0.0)
     }
 }
 
