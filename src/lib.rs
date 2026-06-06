@@ -8,9 +8,9 @@ where
 {
     fn approx_eq(&self, other: &Rhs) -> bool;
 
-    fn approx_ne(&self, other: &Rhs) -> bool {
-        !self.approx_eq(other)
-    }
+    //fn approx_ne(&self, other: &Rhs) -> bool {
+    //    !self.approx_eq(other)
+    //}
 }
 
 impl ApproxEq for Real {
