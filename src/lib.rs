@@ -224,6 +224,11 @@ impl Vector {
 
     pub fn normalize(&self) -> Self {
         let magnitude = self.len();
+        let magnitude = if magnitude.approx_ne(&0.0) {
+            magnitude
+        } else {
+            1.0
+        };
 
         Self {
             x: self.x / magnitude,
@@ -539,6 +544,11 @@ mod tests {
     }
 
     #[test]
+    fn magnitude_of_zero_vector() {
+        assert!(Real::approx_eq(&Vector::default().len(), &0.0));
+    }
+
+    #[test]
     fn normalize_vectors() {
         let v1 = Vector::new(4.0, 0.0, 0.0);
         let v2 = Vector::new(1.0, 2.0, 3.0);
@@ -555,6 +565,13 @@ mod tests {
         let v = Vector::new(1.0, -2.0, 3.0);
 
         assert!(Real::approx_eq(&v.normalize().len(), &1.0));
+    }
+
+    #[test]
+    fn normalize_zero_vector() {
+        let zero = Vector::default();
+
+        assert_eq!(zero.normalize(), zero);
     }
 
     #[test]
