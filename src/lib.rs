@@ -515,6 +515,22 @@ mod tests {
             &(14.0 as Real).sqrt()
         ));
     }
+
+    #[test]
+    fn normalize_vectors() {
+        let v1 = Vector::new(4.0, 0.0, 0.0);
+        let v2 = Vector::new(1.0, 2.0, 3.0);
+
+        assert_eq!(v1.normalize(), Vector::new(1.0, 0.0, 0.0));
+        assert_eq!(v2.normalize(), Vector::new(1.0, 2.0, 3.0) / 14.0.sqrt());
+    }
+
+    #[test]
+    fn normalized_vector_is_unit() {
+        let v = Vector::new(1.0, -2.0, 3.0);
+
+        assert!(Real::approx_eq(v.normalize().len(), &1.0));
+    }
 }
 
 #[cfg(doctest)]
