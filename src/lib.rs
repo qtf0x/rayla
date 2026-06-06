@@ -45,12 +45,12 @@ impl PartialEq for Tuple {
 impl Add for Tuple {
     type Output = Self;
 
-    fn add(self, other: Self) -> Self::Output {
+    fn add(self, rhs: Self) -> Self::Output {
         Self::Output {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: self.z + other.z,
-            w: self.w + other.w,
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
+            w: self.w + rhs.w,
         }
     }
 }
@@ -58,12 +58,12 @@ impl Add for Tuple {
 impl Sub for Tuple {
     type Output = Self;
 
-    fn sub(self, other: Self) -> Self::Output {
+    fn sub(self, rhs: Self) -> Self::Output {
         Self::Output {
-            x: self.x - other.x,
-            y: self.y - other.y,
-            z: self.z - other.z,
-            w: self.w - other.w,
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
+            w: self.w - rhs.w,
         }
     }
 }
@@ -84,12 +84,12 @@ impl Neg for Tuple {
 impl Mul<Real> for Tuple {
     type Output = Self;
 
-    fn mul(self, rhs: Real) -> Self::Output {
+    fn mul(self, scalar: Real) -> Self::Output {
         Self::Output {
-            x: self.x * rhs,
-            y: self.y * rhs,
-            z: self.z * rhs,
-            w: self.w * rhs,
+            x: self.x * scalar,
+            y: self.y * scalar,
+            z: self.z * scalar,
+            w: self.w * scalar,
         }
     }
 }
@@ -110,12 +110,12 @@ impl Mul<Tuple> for Real {
 impl Div<Real> for Tuple {
     type Output = Self;
 
-    fn div(self, rhs: Real) -> Self::Output {
+    fn div(self, scalar: Real) -> Self::Output {
         Self::Output {
-            x: self.x / rhs,
-            y: self.y / rhs,
-            z: self.z / rhs,
-            w: self.w / rhs,
+            x: self.x / scalar,
+            y: self.y / scalar,
+            z: self.z / scalar,
+            w: self.w / scalar,
         }
     }
 }
@@ -127,8 +127,8 @@ impl From<Point> for Tuple {
 }
 
 impl From<Vector> for Tuple {
-    fn from(p: Vector) -> Self {
-        Self::new(p.x, p.y, p.z, 0.0)
+    fn from(v: Vector) -> Self {
+        Self::new(v.x, v.y, v.z, 0.0)
     }
 }
 
@@ -161,11 +161,11 @@ impl PartialEq for Point {
 impl Sub for Point {
     type Output = Vector;
 
-    fn sub(self, other: Self) -> Self::Output {
+    fn sub(self, start: Self) -> Self::Output {
         Self::Output {
-            x: self.x - other.x,
-            y: self.y - other.y,
-            z: self.z - other.z,
+            x: self.x - start.x,
+            y: self.y - start.y,
+            z: self.z - start.z,
         }
     }
 }
@@ -173,11 +173,11 @@ impl Sub for Point {
 impl Add<Vector> for Point {
     type Output = Self;
 
-    fn add(self, rhs: Vector) -> Self::Output {
+    fn add(self, translation: Vector) -> Self::Output {
         Self::Output {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-            z: self.z + rhs.z,
+            x: self.x + translation.x,
+            y: self.y + translation.y,
+            z: self.z + translation.z,
         }
     }
 }
@@ -185,11 +185,11 @@ impl Add<Vector> for Point {
 impl Sub<Vector> for Point {
     type Output = Self;
 
-    fn sub(self, rhs: Vector) -> Self::Output {
+    fn sub(self, translation: Vector) -> Self::Output {
         Self::Output {
-            x: self.x - rhs.x,
-            y: self.y - rhs.y,
-            z: self.z - rhs.z,
+            x: self.x - translation.x,
+            y: self.y - translation.y,
+            z: self.z - translation.z,
         }
     }
 }
@@ -230,11 +230,11 @@ impl PartialEq for Vector {
 impl Add for Vector {
     type Output = Self;
 
-    fn add(self, other: Self) -> Self::Output {
+    fn add(self, rhs: Self) -> Self::Output {
         Self::Output {
-            x: self.x + other.x,
-            y: self.y + other.y,
-            z: self.z + other.z,
+            x: self.x + rhs.x,
+            y: self.y + rhs.y,
+            z: self.z + rhs.z,
         }
     }
 }
@@ -242,11 +242,11 @@ impl Add for Vector {
 impl Sub for Vector {
     type Output = Self;
 
-    fn sub(self, other: Self) -> Self::Output {
+    fn sub(self, rhs: Self) -> Self::Output {
         Self::Output {
-            x: self.x - other.x,
-            y: self.y - other.y,
-            z: self.z - other.z,
+            x: self.x - rhs.x,
+            y: self.y - rhs.y,
+            z: self.z - rhs.z,
         }
     }
 }
@@ -266,11 +266,11 @@ impl Neg for Vector {
 impl Add<Point> for Vector {
     type Output = Point;
 
-    fn add(self, rhs: Point) -> Self::Output {
+    fn add(self, position: Point) -> Self::Output {
         Self::Output {
-            x: self.x + rhs.x,
-            y: self.y + rhs.y,
-            z: self.z + rhs.z,
+            x: self.x + position.x,
+            y: self.y + position.y,
+            z: self.z + position.z,
         }
     }
 }
@@ -278,11 +278,11 @@ impl Add<Point> for Vector {
 impl Mul<Real> for Vector {
     type Output = Self;
 
-    fn mul(self, rhs: Real) -> Self::Output {
+    fn mul(self, scalar: Real) -> Self::Output {
         Self::Output {
-            x: self.x * rhs,
-            y: self.y * rhs,
-            z: self.z * rhs,
+            x: self.x * scalar,
+            y: self.y * scalar,
+            z: self.z * scalar,
         }
     }
 }
@@ -290,7 +290,7 @@ impl Mul<Real> for Vector {
 impl Mul<Vector> for Real {
     type Output = Vector;
 
-    fn mul(self, rhs: Self::Output) -> Self::Output {
+    fn mul(self, rhs: Vector) -> Self::Output {
         Self::Output {
             x: self * rhs.x,
             y: self * rhs.y,
@@ -302,11 +302,11 @@ impl Mul<Vector> for Real {
 impl Div<Real> for Vector {
     type Output = Self;
 
-    fn div(self, rhs: Real) -> Self::Output {
+    fn div(self, scalar: Real) -> Self::Output {
         Self::Output {
-            x: self.x / rhs,
-            y: self.y / rhs,
-            z: self.z / rhs,
+            x: self.x / scalar,
+            y: self.y / scalar,
+            z: self.z / scalar,
         }
     }
 }
