@@ -354,6 +354,272 @@ impl TryFrom<Tuple> for Vector {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct Matrix4 {
+    data: [[Real; 4]; 4],
+}
+
+impl Matrix4 {
+    pub const IDENTITY: Self = Self {
+        data: [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, 0.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ],
+    };
+
+    pub fn new(data: [[Real; 4]; 4]) -> Self {
+        Self { data }
+    }
+
+    pub fn get(&self, row: usize, col: usize) -> Real {
+        self.data[row][col]
+    }
+
+    pub fn transpose(&self) -> Self {
+        let mut data = [[0.0; 4]; 4];
+
+        for (row, source) in self.data.iter().enumerate() {
+            for (col, &value) in source.iter().enumerate() {
+                data[col][row] = value;
+            }
+        }
+
+        Self { data }
+    }
+
+    pub fn determinant(&self) -> Real {
+        (0..4)
+            .map(|col| self.data[0][col] * self.cofactor(0, col))
+            .sum()
+    }
+
+    pub fn inverse(&self) -> Option<Self> {
+        let determinant = self.determinant();
+
+        if determinant.approx_eq(&0.0) {
+            return None;
+        }
+
+        let mut cofactors = [[0.0; 4]; 4];
+
+        for (row, target) in cofactors.iter_mut().enumerate() {
+            for (col, cell) in target.iter_mut().enumerate() {
+                *cell = self.cofactor(row, col) / determinant;
+            }
+        }
+
+        Some(Self { data: cofactors }.transpose())
+    }
+
+    pub fn then(self, next: Self) -> Self {
+        next * self
+    }
+
+    pub fn translate(self, x: Real, y: Real, z: Real) -> Self {
+        self.then(translation(x, y, z))
+    }
+
+    pub fn scale(self, x: Real, y: Real, z: Real) -> Self {
+        self.then(scaling(x, y, z))
+    }
+
+    pub fn rotate_x(self, radians: Real) -> Self {
+        self.then(rotation_x(radians))
+    }
+
+    pub fn rotate_y(self, radians: Real) -> Self {
+        self.then(rotation_y(radians))
+    }
+
+    pub fn rotate_z(self, radians: Real) -> Self {
+        self.then(rotation_z(radians))
+    }
+
+    pub fn shear(self, xy: Real, xz: Real, yx: Real, yz: Real, zx: Real, zy: Real) -> Self {
+        self.then(shearing(xy, xz, yx, yz, zx, zy))
+    }
+
+    fn submatrix3(&self, drop_row: usize, drop_col: usize) -> [[Real; 3]; 3] {
+        let mut sub = [[0.0; 3]; 3];
+        let mut target_row = 0;
+
+        for row in 0..4 {
+            if row == drop_row {
+                continue;
+            }
+
+            let mut target_col = 0;
+
+            for col in 0..4 {
+                if col == drop_col {
+                    continue;
+                }
+
+                sub[target_row][target_col] = self.data[row][col];
+                target_col += 1;
+            }
+
+            target_row += 1;
+        }
+
+        sub
+    }
+
+    fn cofactor(&self, row: usize, col: usize) -> Real {
+        let minor = determinant3(&self.submatrix3(row, col));
+
+        if (row + col).is_multiple_of(2) {
+            minor
+        } else {
+            -minor
+        }
+    }
+}
+
+fn determinant3(m: &[[Real; 3]; 3]) -> Real {
+    m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+        - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+        + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
+}
+
+impl Default for Matrix4 {
+    fn default() -> Self {
+        Self::IDENTITY
+    }
+}
+
+impl PartialEq for Matrix4 {
+    fn eq(&self, other: &Self) -> bool {
+        self.data
+            .iter()
+            .flatten()
+            .zip(other.data.iter().flatten())
+            .all(|(lhs, rhs)| lhs.approx_eq(rhs))
+    }
+}
+
+impl Mul for Matrix4 {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        let mut data = [[0.0; 4]; 4];
+
+        for (row, out_row) in data.iter_mut().enumerate() {
+            for (col, cell) in out_row.iter_mut().enumerate() {
+                *cell = (0..4).map(|k| self.data[row][k] * rhs.data[k][col]).sum();
+            }
+        }
+
+        Self::Output { data }
+    }
+}
+
+impl Mul<Tuple> for Matrix4 {
+    type Output = Tuple;
+
+    fn mul(self, rhs: Tuple) -> Self::Output {
+        let row_times_tuple =
+            |row: &[Real; 4]| row[0] * rhs.x + row[1] * rhs.y + row[2] * rhs.z + row[3] * rhs.w;
+
+        Self::Output {
+            x: row_times_tuple(&self.data[0]),
+            y: row_times_tuple(&self.data[1]),
+            z: row_times_tuple(&self.data[2]),
+            w: row_times_tuple(&self.data[3]),
+        }
+    }
+}
+
+impl Mul<Point> for Matrix4 {
+    type Output = Point;
+
+    fn mul(self, rhs: Point) -> Self::Output {
+        let transformed = self * Tuple::from(rhs);
+
+        Self::Output {
+            x: transformed.x,
+            y: transformed.y,
+            z: transformed.z,
+        }
+    }
+}
+
+impl Mul<Vector> for Matrix4 {
+    type Output = Vector;
+
+    fn mul(self, rhs: Vector) -> Self::Output {
+        let transformed = self * Tuple::from(rhs);
+
+        Self::Output {
+            x: transformed.x,
+            y: transformed.y,
+            z: transformed.z,
+        }
+    }
+}
+
+pub fn translation(x: Real, y: Real, z: Real) -> Matrix4 {
+    Matrix4::new([
+        [1.0, 0.0, 0.0, x],
+        [0.0, 1.0, 0.0, y],
+        [0.0, 0.0, 1.0, z],
+        [0.0, 0.0, 0.0, 1.0],
+    ])
+}
+
+pub fn scaling(x: Real, y: Real, z: Real) -> Matrix4 {
+    Matrix4::new([
+        [x, 0.0, 0.0, 0.0],
+        [0.0, y, 0.0, 0.0],
+        [0.0, 0.0, z, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ])
+}
+
+pub fn rotation_x(radians: Real) -> Matrix4 {
+    let (sin, cos) = radians.sin_cos();
+
+    Matrix4::new([
+        [1.0, 0.0, 0.0, 0.0],
+        [0.0, cos, -sin, 0.0],
+        [0.0, sin, cos, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ])
+}
+
+pub fn rotation_y(radians: Real) -> Matrix4 {
+    let (sin, cos) = radians.sin_cos();
+
+    Matrix4::new([
+        [cos, 0.0, sin, 0.0],
+        [0.0, 1.0, 0.0, 0.0],
+        [-sin, 0.0, cos, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ])
+}
+
+pub fn rotation_z(radians: Real) -> Matrix4 {
+    let (sin, cos) = radians.sin_cos();
+
+    Matrix4::new([
+        [cos, -sin, 0.0, 0.0],
+        [sin, cos, 0.0, 0.0],
+        [0.0, 0.0, 1.0, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ])
+}
+
+pub fn shearing(xy: Real, xz: Real, yx: Real, yz: Real, zx: Real, zy: Real) -> Matrix4 {
+    Matrix4::new([
+        [1.0, xy, xz, 0.0],
+        [yx, 1.0, yz, 0.0],
+        [zx, zy, 1.0, 0.0],
+        [0.0, 0.0, 0.0, 1.0],
+    ])
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -432,9 +698,9 @@ mod tests {
 
     #[test]
     fn add_vectors_to_points() {
-        let p = Point::new(9.0, 3.1415, 0.01);
+        let p = Point::new(9.0, std::f64::consts::PI, 0.01);
         let v = Vector::new(1.0, -1.0, 14.3);
-        let res = Point::new(10.0, 2.1415, 14.31);
+        let res = Point::new(10.0, std::f64::consts::PI - 1.0, 14.31);
 
         assert_eq!(p + v, res);
         assert_eq!(v + p, res);
@@ -596,14 +862,14 @@ mod tests {
 
 #[cfg(doctest)]
 mod doctests {
-    /// ```compile_fail,E0369
+    /// ```compile_fail,E0308
     /// use rayla::*;
     ///
     /// Point::new(12.0, -24.1, 48.2) + Point::new(-12.0, 24.1, -48.2);
     /// ```
     fn _add_points() {}
 
-    /// ```compile_fail,E0369
+    /// ```compile_fail,E0308
     /// use rayla::*;
     ///
     /// Vector::new(5.0, 6.0, 7.0) - Point::new(3.0, 2.0, 1.0);
@@ -624,7 +890,7 @@ mod doctests {
     /// ```
     fn _multiply_point_by_scalar() {}
 
-    /// ```compile_fail,E0369
+    /// ```compile_fail,E0277
     /// use rayla::*;
     ///
     /// 3.5 * Point::new(1.0, 2.0, 3.0);
@@ -637,4 +903,340 @@ mod doctests {
     /// Point::new(1.0, 2.0, 3.0) / 2.0;
     /// ```
     fn _scale_divide_points() {}
+}
+
+#[cfg(test)]
+mod matrix_tests {
+    use super::*;
+    use std::f64::consts::{FRAC_1_SQRT_2, FRAC_PI_2, FRAC_PI_4};
+
+    #[test]
+    fn construct_and_inspect() {
+        let m = Matrix4::new([
+            [1.0, 2.0, 3.0, 4.0],
+            [5.5, 6.5, 7.5, 8.5],
+            [9.0, 10.0, 11.0, 12.0],
+            [13.5, 14.5, 15.5, 16.5],
+        ]);
+
+        assert!(m.get(0, 0).approx_eq(&1.0));
+        assert!(m.get(0, 3).approx_eq(&4.0));
+        assert!(m.get(1, 0).approx_eq(&5.5));
+        assert!(m.get(1, 2).approx_eq(&7.5));
+        assert!(m.get(3, 2).approx_eq(&15.5));
+    }
+
+    #[test]
+    fn equality() {
+        let a = Matrix4::new([
+            [1.0, 2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.0, 8.0],
+            [9.0, 8.0, 7.0, 6.0],
+            [5.0, 4.0, 3.0, 2.0],
+        ]);
+        let b = a;
+        let c = Matrix4::new([
+            [2.0, 3.0, 4.0, 5.0],
+            [6.0, 7.0, 8.0, 9.0],
+            [8.0, 7.0, 6.0, 5.0],
+            [4.0, 3.0, 2.0, 1.0],
+        ]);
+
+        assert_eq!(a, b);
+        assert_ne!(a, c);
+    }
+
+    #[test]
+    fn multiply_matrices() {
+        let a = Matrix4::new([
+            [1.0, 2.0, 3.0, 4.0],
+            [5.0, 6.0, 7.0, 8.0],
+            [9.0, 8.0, 7.0, 6.0],
+            [5.0, 4.0, 3.0, 2.0],
+        ]);
+        let b = Matrix4::new([
+            [-2.0, 1.0, 2.0, 3.0],
+            [3.0, 2.0, 1.0, -1.0],
+            [4.0, 3.0, 6.0, 5.0],
+            [1.0, 2.0, 7.0, 8.0],
+        ]);
+
+        assert_eq!(
+            a * b,
+            Matrix4::new([
+                [20.0, 22.0, 50.0, 48.0],
+                [44.0, 54.0, 114.0, 108.0],
+                [40.0, 58.0, 110.0, 102.0],
+                [16.0, 26.0, 46.0, 42.0],
+            ])
+        );
+    }
+
+    #[test]
+    fn multiply_by_tuple() {
+        let a = Matrix4::new([
+            [1.0, 2.0, 3.0, 4.0],
+            [2.0, 4.0, 4.0, 2.0],
+            [8.0, 6.0, 4.0, 1.0],
+            [0.0, 0.0, 0.0, 1.0],
+        ]);
+
+        assert_eq!(
+            a * Tuple::new(1.0, 2.0, 3.0, 1.0),
+            Tuple::new(18.0, 24.0, 33.0, 1.0)
+        );
+    }
+
+    #[test]
+    fn multiply_by_identity() {
+        let a = Matrix4::new([
+            [0.0, 1.0, 2.0, 4.0],
+            [1.0, 2.0, 4.0, 8.0],
+            [2.0, 4.0, 8.0, 16.0],
+            [4.0, 8.0, 16.0, 32.0],
+        ]);
+
+        assert_eq!(a * Matrix4::IDENTITY, a);
+        assert_eq!(Matrix4::IDENTITY * a, a);
+    }
+
+    #[test]
+    fn default_is_identity() {
+        assert_eq!(Matrix4::default(), Matrix4::IDENTITY);
+    }
+
+    #[test]
+    fn transpose() {
+        let a = Matrix4::new([
+            [0.0, 9.0, 3.0, 0.0],
+            [9.0, 8.0, 0.0, 8.0],
+            [1.0, 8.0, 5.0, 3.0],
+            [0.0, 0.0, 5.0, 8.0],
+        ]);
+
+        assert_eq!(
+            a.transpose(),
+            Matrix4::new([
+                [0.0, 9.0, 1.0, 0.0],
+                [9.0, 8.0, 8.0, 0.0],
+                [3.0, 0.0, 5.0, 5.0],
+                [0.0, 8.0, 3.0, 8.0],
+            ])
+        );
+        assert_eq!(Matrix4::IDENTITY.transpose(), Matrix4::IDENTITY);
+    }
+
+    #[test]
+    fn determinant() {
+        let a = Matrix4::new([
+            [-2.0, -8.0, 3.0, 5.0],
+            [-3.0, 1.0, 7.0, 3.0],
+            [1.0, 2.0, -9.0, 6.0],
+            [-6.0, 7.0, 7.0, -9.0],
+        ]);
+
+        assert!(a.determinant().approx_eq(&-4071.0));
+    }
+
+    #[test]
+    fn invertible_and_noninvertible() {
+        let invertible = Matrix4::new([
+            [6.0, 4.0, 4.0, 4.0],
+            [5.0, 5.0, 7.0, 6.0],
+            [4.0, -9.0, 3.0, -7.0],
+            [9.0, 1.0, 7.0, -6.0],
+        ]);
+        let singular = Matrix4::new([
+            [-4.0, 2.0, -2.0, -3.0],
+            [9.0, 6.0, 2.0, 6.0],
+            [0.0, -5.0, 1.0, -5.0],
+            [0.0, 0.0, 0.0, 0.0],
+        ]);
+
+        assert!(invertible.inverse().is_some());
+        assert!(singular.inverse().is_none());
+    }
+
+    #[test]
+    fn inverse() {
+        let a = Matrix4::new([
+            [-5.0, 2.0, 6.0, -8.0],
+            [1.0, -5.0, 1.0, 8.0],
+            [7.0, 7.0, -6.0, -7.0],
+            [1.0, -3.0, 7.0, 4.0],
+        ]);
+
+        assert_eq!(
+            a.inverse().unwrap(),
+            Matrix4::new([
+                [116.0 / 532.0, 240.0 / 532.0, 128.0 / 532.0, -24.0 / 532.0],
+                [
+                    -430.0 / 532.0,
+                    -775.0 / 532.0,
+                    -236.0 / 532.0,
+                    277.0 / 532.0
+                ],
+                [-42.0 / 532.0, -119.0 / 532.0, -28.0 / 532.0, 105.0 / 532.0],
+                [
+                    -278.0 / 532.0,
+                    -433.0 / 532.0,
+                    -160.0 / 532.0,
+                    163.0 / 532.0
+                ],
+            ])
+        );
+    }
+
+    #[test]
+    fn product_times_inverse_is_original() {
+        let a = Matrix4::new([
+            [3.0, -9.0, 7.0, 3.0],
+            [3.0, -8.0, 2.0, -9.0],
+            [-4.0, 4.0, 4.0, 1.0],
+            [-6.0, 5.0, -1.0, 1.0],
+        ]);
+        let b = Matrix4::new([
+            [8.0, 2.0, 2.0, 2.0],
+            [3.0, -1.0, 7.0, 0.0],
+            [7.0, 0.0, 5.0, 4.0],
+            [6.0, -2.0, 0.0, 5.0],
+        ]);
+
+        assert_eq!((a * b) * b.inverse().unwrap(), a);
+    }
+
+    #[test]
+    fn translate_point() {
+        assert_eq!(
+            translation(5.0, -3.0, 2.0) * Point::new(-3.0, 4.0, 5.0),
+            Point::new(2.0, 1.0, 7.0)
+        );
+    }
+
+    #[test]
+    fn inverse_translation_moves_backwards() {
+        assert_eq!(
+            translation(5.0, -3.0, 2.0).inverse().unwrap() * Point::new(-3.0, 4.0, 5.0),
+            Point::new(-8.0, 7.0, 3.0)
+        );
+    }
+
+    #[test]
+    fn translation_does_not_affect_vectors() {
+        let v = Vector::new(-3.0, 4.0, 5.0);
+
+        assert_eq!(translation(5.0, -3.0, 2.0) * v, v);
+    }
+
+    #[test]
+    fn scale_point_and_vector() {
+        assert_eq!(
+            scaling(2.0, 3.0, 4.0) * Point::new(-4.0, 6.0, 8.0),
+            Point::new(-8.0, 18.0, 32.0)
+        );
+        assert_eq!(
+            scaling(2.0, 3.0, 4.0) * Vector::new(-4.0, 6.0, 8.0),
+            Vector::new(-8.0, 18.0, 32.0)
+        );
+    }
+
+    #[test]
+    fn inverse_scaling_shrinks() {
+        assert_eq!(
+            scaling(2.0, 3.0, 4.0).inverse().unwrap() * Vector::new(-4.0, 6.0, 8.0),
+            Vector::new(-2.0, 2.0, 2.0)
+        );
+    }
+
+    #[test]
+    fn reflection_is_negative_scaling() {
+        assert_eq!(
+            scaling(-1.0, 1.0, 1.0) * Point::new(2.0, 3.0, 4.0),
+            Point::new(-2.0, 3.0, 4.0)
+        );
+    }
+
+    #[test]
+    fn rotate_around_x() {
+        let p = Point::new(0.0, 1.0, 0.0);
+
+        assert_eq!(
+            rotation_x(FRAC_PI_4) * p,
+            Point::new(0.0, FRAC_1_SQRT_2, FRAC_1_SQRT_2)
+        );
+        assert_eq!(rotation_x(FRAC_PI_2) * p, Point::new(0.0, 0.0, 1.0));
+    }
+
+    #[test]
+    fn inverse_x_rotation_goes_the_other_way() {
+        let p = Point::new(0.0, 1.0, 0.0);
+
+        assert_eq!(
+            rotation_x(FRAC_PI_4).inverse().unwrap() * p,
+            Point::new(0.0, FRAC_1_SQRT_2, -FRAC_1_SQRT_2)
+        );
+    }
+
+    #[test]
+    fn rotate_around_y() {
+        let p = Point::new(0.0, 0.0, 1.0);
+
+        assert_eq!(
+            rotation_y(FRAC_PI_4) * p,
+            Point::new(FRAC_1_SQRT_2, 0.0, FRAC_1_SQRT_2)
+        );
+        assert_eq!(rotation_y(FRAC_PI_2) * p, Point::new(1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn rotate_around_z() {
+        let p = Point::new(0.0, 1.0, 0.0);
+
+        assert_eq!(
+            rotation_z(FRAC_PI_4) * p,
+            Point::new(-FRAC_1_SQRT_2, FRAC_1_SQRT_2, 0.0)
+        );
+        assert_eq!(rotation_z(FRAC_PI_2) * p, Point::new(-1.0, 0.0, 0.0));
+    }
+
+    #[test]
+    fn shear_moves_components() {
+        let p = Point::new(2.0, 3.0, 4.0);
+
+        assert_eq!(
+            shearing(1.0, 0.0, 0.0, 0.0, 0.0, 0.0) * p,
+            Point::new(5.0, 3.0, 4.0)
+        );
+        assert_eq!(
+            shearing(0.0, 1.0, 0.0, 0.0, 0.0, 0.0) * p,
+            Point::new(6.0, 3.0, 4.0)
+        );
+        assert_eq!(
+            shearing(0.0, 0.0, 1.0, 0.0, 0.0, 0.0) * p,
+            Point::new(2.0, 5.0, 4.0)
+        );
+        assert_eq!(
+            shearing(0.0, 0.0, 0.0, 1.0, 0.0, 0.0) * p,
+            Point::new(2.0, 7.0, 4.0)
+        );
+        assert_eq!(
+            shearing(0.0, 0.0, 0.0, 0.0, 1.0, 0.0) * p,
+            Point::new(2.0, 3.0, 6.0)
+        );
+        assert_eq!(
+            shearing(0.0, 0.0, 0.0, 0.0, 0.0, 1.0) * p,
+            Point::new(2.0, 3.0, 7.0)
+        );
+    }
+
+    #[test]
+    fn chained_transforms_apply_in_sequence() {
+        let p = Point::new(1.0, 0.0, 1.0);
+        let transform = Matrix4::IDENTITY
+            .rotate_x(FRAC_PI_2)
+            .scale(5.0, 5.0, 5.0)
+            .translate(10.0, 5.0, 7.0);
+
+        assert_eq!(transform * p, Point::new(15.0, 0.0, 7.0));
+    }
 }
