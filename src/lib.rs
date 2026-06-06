@@ -221,6 +221,16 @@ impl Vector {
     pub fn len(&self) -> Real {
         (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
     }
+
+    pub fn normalize(&self) -> Self {
+        let magnitude = self.len();
+
+        Self {
+            x: self.x / magnitude,
+            y: self.y / magnitude,
+            z: self.z / magnitude,
+        }
+    }
 }
 
 impl PartialEq for Vector {
@@ -522,14 +532,17 @@ mod tests {
         let v2 = Vector::new(1.0, 2.0, 3.0);
 
         assert_eq!(v1.normalize(), Vector::new(1.0, 0.0, 0.0));
-        assert_eq!(v2.normalize(), Vector::new(1.0, 2.0, 3.0) / 14.0.sqrt());
+        assert_eq!(
+            v2.normalize(),
+            Vector::new(1.0, 2.0, 3.0) / (14.0 as Real).sqrt()
+        );
     }
 
     #[test]
     fn normalized_vector_is_unit() {
         let v = Vector::new(1.0, -2.0, 3.0);
 
-        assert!(Real::approx_eq(v.normalize().len(), &1.0));
+        assert!(Real::approx_eq(&v.normalize().len(), &1.0));
     }
 }
 
