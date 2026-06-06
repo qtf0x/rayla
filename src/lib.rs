@@ -217,6 +217,10 @@ impl Vector {
     pub fn new(x: Real, y: Real, z: Real) -> Self {
         Self { x, y, z }
     }
+
+    pub fn len(&self) -> Real {
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
+    }
 }
 
 impl PartialEq for Vector {
@@ -493,11 +497,11 @@ mod tests {
         assert!(Real::approx_eq(&Vector::new(0.0, 0.0, 1.0).len(), &1.0));
         assert!(Real::approx_eq(
             &Vector::new(1.0, 2.0, 3.0).len(),
-            &14.0.sqrt()
+            &(14.0 as Real).sqrt()
         ));
         assert!(Real::approx_eq(
             &Vector::new(-1.0, -2.0, -3.0).len(),
-            &14.0.sqrt()
+            &(14.0 as Real).sqrt()
         ));
     }
 }
