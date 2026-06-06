@@ -231,6 +231,18 @@ impl Vector {
             z: self.z / magnitude,
         }
     }
+
+    pub fn dot(&self, rhs: &Self) -> Real {
+        self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
+    }
+
+    pub fn cross(&self, rhs: &Self) -> Self {
+        Self {
+            x: self.y * rhs.z - self.z * rhs.y,
+            y: self.z * rhs.x - self.x * rhs.z,
+            z: self.x * rhs.y - self.y * rhs.x,
+        }
+    }
 }
 
 impl PartialEq for Vector {
@@ -543,6 +555,25 @@ mod tests {
         let v = Vector::new(1.0, -2.0, 3.0);
 
         assert!(Real::approx_eq(&v.normalize().len(), &1.0));
+    }
+
+    #[test]
+    fn vector_dot_product() {
+        let v1 = Vector::new(1.0, 2.0, 3.0);
+        let v2 = Vector::new(2.0, 3.0, 4.0);
+
+        assert!(Real::approx_eq(&v1.dot(&v2), &20.0));
+        assert!(Real::approx_eq(&v2.dot(&v1), &20.0));
+    }
+
+    #[test]
+    fn vector_cross_product() {
+        let v1 = Vector::new(1.0, 2.0, 3.0);
+        let v2 = Vector::new(2.0, 3.0, 4.0);
+
+        assert_eq!(v1.cross(&v2), Vector::new(-1.0, 2.0, -1.0));
+        assert_eq!(v2.cross(&v1), Vector::new(1.0, -2.0, 1.0));
+        assert_ne!(v1.cross(&v2), v2.cross(&v1));
     }
 }
 
