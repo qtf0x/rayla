@@ -1,14 +1,13 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-type Real = f64;
+pub type Real = f64;
 
-trait ApproxEq<Rhs = Self>
+pub trait ApproxEq<Rhs = Self>
 where
     Rhs: ?Sized,
 {
     fn approx_eq(&self, other: &Rhs) -> bool;
 
-    #[allow(dead_code)]
     fn approx_ne(&self, other: &Rhs) -> bool {
         !self.approx_eq(other)
     }
