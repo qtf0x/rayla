@@ -134,7 +134,7 @@ impl From<Vector> for Tuple {
 
 #[derive(Debug)]
 pub enum TupleConversionError {
-    BadWValue,
+    BadWValue(Real),
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -201,7 +201,7 @@ impl TryFrom<Tuple> for Point {
         if Real::approx_eq(&t.w, &1.0) {
             Ok(Self::new(t.x, t.y, t.z))
         } else {
-            Err(Self::Error::BadWValue)
+            Err(Self::Error::BadWValue(t.w))
         }
     }
 }
@@ -322,7 +322,7 @@ impl TryFrom<Tuple> for Vector {
         if Real::approx_eq(&t.w, &0.0) {
             Ok(Self::new(t.x, t.y, t.z))
         } else {
-            Err(Self::Error::BadWValue)
+            Err(Self::Error::BadWValue(t.w))
         }
     }
 }
@@ -355,6 +355,17 @@ mod tests {
 
         std::assert_matches!(Point::try_from(a), Err(_));
         std::assert_matches!(Vector::try_from(a), Ok(_));
+    }
+
+    #[test]
+    fn tuple_is_neither() {
+        let t1 = Tuple::new(4.3, -4.2, 3.1, 0.001);
+        let t2 = Tuple::new(4.3, -4.2, 3.1, 100_000.0);
+
+        std::assert_matches!(Point::try_from(t1), Err(_));
+        std::assert_matches!(Vector::try_from(t1), Err(_));
+        std::assert_matches!(Point::try_from(t2), Err(_));
+        std::assert_matches!(Vector::try_from(t2), Err(_));
     }
 
     #[test]
