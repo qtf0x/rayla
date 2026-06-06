@@ -1,29 +1,44 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
-fn flt_approx_eq(f1: f64, f2: f64) -> bool {
-    (f1 - f2).abs() < 1.0E-6
+type Real = f64;
+
+trait ApproxEq<Rhs = Self>
+where
+    Rhs: ?Sized,
+{
+    fn approx_eq(&self, other: &Rhs) -> bool;
+
+    fn approx_ne(&self, other: &Rhs) -> bool {
+        !self.approx_eq(other)
+    }
+}
+
+impl ApproxEq for Real {
+    fn approx_eq(&self, other: &Self) -> bool {
+        (self - other).abs() < 1.0E-6
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Tuple {
-    x: f64,
-    y: f64,
-    z: f64,
-    w: f64,
+    x: Real,
+    y: Real,
+    z: Real,
+    w: Real,
 }
 
 impl Tuple {
-    fn new(x: f64, y: f64, z: f64, w: f64) -> Self {
+    fn new(x: Real, y: Real, z: Real, w: Real) -> Self {
         Self { x, y, z, w }
     }
 }
 
 impl PartialEq for Tuple {
     fn eq(&self, other: &Self) -> bool {
-        flt_approx_eq(self.x, other.x)
-            && flt_approx_eq(self.y, other.y)
-            && flt_approx_eq(self.z, other.z)
-            && flt_approx_eq(self.w, other.w)
+        Real::approx_eq(&self.x, &other.x)
+            && Real::approx_eq(&self.y, &other.y)
+            && Real::approx_eq(&self.z, &other.z)
+            && Real::approx_eq(&self.w, &other.w)
     }
 }
 
@@ -66,10 +81,10 @@ impl Neg for Tuple {
     }
 }
 
-impl Mul<f64> for Tuple {
+impl Mul<Real> for Tuple {
     type Output = Self;
 
-    fn mul(self, rhs: f64) -> Self::Output {
+    fn mul(self, rhs: Real) -> Self::Output {
         Self::Output {
             x: self.x * rhs,
             y: self.y * rhs,
@@ -79,7 +94,7 @@ impl Mul<f64> for Tuple {
     }
 }
 
-impl Mul<Tuple> for f64 {
+impl Mul<Tuple> for Real {
     type Output = Tuple;
 
     fn mul(self, rhs: Tuple) -> Self::Output {
@@ -92,10 +107,10 @@ impl Mul<Tuple> for f64 {
     }
 }
 
-impl Div<f64> for Tuple {
+impl Div<Real> for Tuple {
     type Output = Self;
 
-    fn div(self, rhs: f64) -> Self::Output {
+    fn div(self, rhs: Real) -> Self::Output {
         Self::Output {
             x: self.x / rhs,
             y: self.y / rhs,
@@ -124,22 +139,22 @@ pub enum TupleConversionError {
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Point {
-    x: f64,
-    y: f64,
-    z: f64,
+    x: Real,
+    y: Real,
+    z: Real,
 }
 
 impl Point {
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
+    pub fn new(x: Real, y: Real, z: Real) -> Self {
         Self { x, y, z }
     }
 }
 
 impl PartialEq for Point {
     fn eq(&self, other: &Self) -> bool {
-        flt_approx_eq(self.x, other.x)
-            && flt_approx_eq(self.y, other.y)
-            && flt_approx_eq(self.z, other.z)
+        Real::approx_eq(&self.x, &other.x)
+            && Real::approx_eq(&self.y, &other.y)
+            && Real::approx_eq(&self.z, &other.z)
     }
 }
 
@@ -183,7 +198,7 @@ impl TryFrom<Tuple> for Point {
     type Error = TupleConversionError;
 
     fn try_from(t: Tuple) -> Result<Self, Self::Error> {
-        if flt_approx_eq(t.w, 1.0) {
+        if Real::approx_eq(&t.w, &1.0) {
             Ok(Self::new(t.x, t.y, t.z))
         } else {
             Err(Self::Error::BadWValue)
@@ -193,22 +208,22 @@ impl TryFrom<Tuple> for Point {
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Vector {
-    x: f64,
-    y: f64,
-    z: f64,
+    x: Real,
+    y: Real,
+    z: Real,
 }
 
 impl Vector {
-    pub fn new(x: f64, y: f64, z: f64) -> Self {
+    pub fn new(x: Real, y: Real, z: Real) -> Self {
         Self { x, y, z }
     }
 }
 
 impl PartialEq for Vector {
     fn eq(&self, other: &Self) -> bool {
-        flt_approx_eq(self.x, other.x)
-            && flt_approx_eq(self.y, other.y)
-            && flt_approx_eq(self.z, other.z)
+        Real::approx_eq(&self.x, &other.x)
+            && Real::approx_eq(&self.y, &other.y)
+            && Real::approx_eq(&self.z, &other.z)
     }
 }
 
@@ -260,10 +275,10 @@ impl Add<Point> for Vector {
     }
 }
 
-impl Mul<f64> for Vector {
+impl Mul<Real> for Vector {
     type Output = Self;
 
-    fn mul(self, rhs: f64) -> Self::Output {
+    fn mul(self, rhs: Real) -> Self::Output {
         Self::Output {
             x: self.x * rhs,
             y: self.y * rhs,
@@ -272,7 +287,7 @@ impl Mul<f64> for Vector {
     }
 }
 
-impl Mul<Vector> for f64 {
+impl Mul<Vector> for Real {
     type Output = Vector;
 
     fn mul(self, rhs: Self::Output) -> Self::Output {
@@ -284,10 +299,10 @@ impl Mul<Vector> for f64 {
     }
 }
 
-impl Div<f64> for Vector {
+impl Div<Real> for Vector {
     type Output = Self;
 
-    fn div(self, rhs: f64) -> Self::Output {
+    fn div(self, rhs: Real) -> Self::Output {
         Self::Output {
             x: self.x / rhs,
             y: self.y / rhs,
@@ -300,7 +315,7 @@ impl TryFrom<Tuple> for Vector {
     type Error = TupleConversionError;
 
     fn try_from(t: Tuple) -> Result<Self, Self::Error> {
-        if flt_approx_eq(t.w, 0.0) {
+        if Real::approx_eq(&t.w, &0.0) {
             Ok(Self::new(t.x, t.y, t.z))
         } else {
             Err(Self::Error::BadWValue)
@@ -473,13 +488,16 @@ mod tests {
 
     #[test]
     fn vector_magnitudes() {
-        assert!(flt_approx_eq(Vector::new(1.0, 0.0, 0.0).len(), 1.0));
-        assert!(flt_approx_eq(Vector::new(0.0, 1.0, 0.0).len(), 1.0));
-        assert!(flt_approx_eq(Vector::new(0.0, 0.0, 1.0).len(), 1.0));
-        assert!(flt_approx_eq(Vector::new(1.0, 2.0, 3.0).len(), 14.0.sqrt()));
-        assert!(flt_approx_eq(
-            Vector::new(-1.0, -2.0, -3.0).len(),
-            14.0.sqrt()
+        assert!(Real::approx_eq(&Vector::new(1.0, 0.0, 0.0).len(), &1.0));
+        assert!(Real::approx_eq(&Vector::new(0.0, 1.0, 0.0).len(), &1.0));
+        assert!(Real::approx_eq(&Vector::new(0.0, 0.0, 1.0).len(), &1.0));
+        assert!(Real::approx_eq(
+            &Vector::new(1.0, 2.0, 3.0).len(),
+            &14.0.sqrt()
+        ));
+        assert!(Real::approx_eq(
+            &Vector::new(-1.0, -2.0, -3.0).len(),
+            &14.0.sqrt()
         ));
     }
 }
