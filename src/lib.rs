@@ -139,9 +139,9 @@ pub enum TupleConversionError {
 
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Point {
-    x: Real,
-    y: Real,
-    z: Real,
+    pub x: Real,
+    pub y: Real,
+    pub z: Real,
 }
 
 impl Point {
