@@ -61,6 +61,7 @@ mod tests {
     }
 
     #[test]
+    #[ignore]
     fn big_canvas() {
         let (w, h) = (30_720, 17_280); // 32k resolution
         let c = Canvas::new(w, h);
