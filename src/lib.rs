@@ -61,6 +61,15 @@ mod tests {
     }
 
     #[test]
+    fn big_canvas() {
+        let (w, h) = (30_720, 17_280); // 32k resolution
+        let c = Canvas::new(w, h);
+
+        std::assert_matches!(c.get(w - 1, h - 1), Some(_));
+        std::assert_matches!(c.get(w, h), None);
+    }
+
+    #[test]
     fn write_pixels_to_canvas() {
         let (w, h) = (1_280, 720);
         let mut c = Canvas::new(w, h);
