@@ -138,6 +138,99 @@ pub enum TupleConversionError {
 }
 
 #[derive(Clone, Copy, Debug, Default)]
+pub struct ColorRGB {
+    pub r: Real,
+    pub g: Real,
+    pub b: Real,
+}
+
+impl ColorRGB {
+    pub fn new(r: Real, g: Real, b: Real) -> Self {
+        Self { r, g, b }
+    }
+}
+
+impl PartialEq for ColorRGB {
+    fn eq(&self, other: &Self) -> bool {
+        Real::approx_eq(&self.r, &other.r)
+            && Real::approx_eq(&self.g, &other.g)
+            && Real::approx_eq(&self.b, &other.b)
+    }
+}
+
+impl Add for ColorRGB {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            r: self.r + rhs.r,
+            g: self.g + rhs.g,
+            b: self.b + rhs.b,
+        }
+    }
+}
+
+impl Sub for ColorRGB {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            r: self.r - rhs.r,
+            g: self.g - rhs.g,
+            b: self.b - rhs.b,
+        }
+    }
+}
+
+impl Mul for ColorRGB {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self::Output {
+            r: self.r * rhs.r,
+            g: self.g * rhs.g,
+            b: self.b * rhs.b,
+        }
+    }
+}
+
+impl Mul<ColorRGB> for Real {
+    type Output = ColorRGB;
+
+    fn mul(self, rhs: ColorRGB) -> Self::Output {
+        Self::Output {
+            r: self * rhs.r,
+            g: self * rhs.g,
+            b: self * rhs.b,
+        }
+    }
+}
+
+impl Mul<Real> for ColorRGB {
+    type Output = Self;
+
+    fn mul(self, rhs: Real) -> Self::Output {
+        Self::Output {
+            r: self.r * rhs,
+            g: self.g * rhs,
+            b: self.b * rhs,
+        }
+    }
+}
+
+impl Div<Real> for ColorRGB {
+    type Output = Self;
+
+    fn div(self, rhs: Real) -> Self::Output {
+        Self::Output {
+            r: self.r / rhs,
+            g: self.g / rhs,
+            b: self.b / rhs,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Point {
     pub x: Real,
     pub y: Real,
@@ -591,6 +684,61 @@ mod tests {
         assert_eq!(v1.cross(&v2), Vector::new(-1.0, 2.0, -1.0));
         assert_eq!(v2.cross(&v1), Vector::new(1.0, -2.0, 1.0));
         assert_ne!(v1.cross(&v2), v2.cross(&v1));
+    }
+
+    #[test]
+    fn color_rgb_access_fields() {
+        let c = ColorRGB::new(-0.5, 0.4, 1.7);
+
+        assert_eq!(c.r, -0.5);
+        assert_eq!(c.g, 0.4);
+        assert_eq!(c.b, 1.7);
+    }
+
+    #[test]
+    fn add_colors_rgb() {
+        let c1 = ColorRGB::new(0.9, 0.6, 0.75);
+        let c2 = ColorRGB::new(0.7, 0.1, 0.25);
+
+        assert_eq!(c1 + c2, ColorRGB::new(1.6, 0.7, 1.0));
+        assert_eq!(c1 + c2, c2 + c1);
+    }
+
+    #[test]
+    fn subtract_colors_rgb() {
+        let c1 = ColorRGB::new(0.9, 0.6, 0.75);
+        let c2 = ColorRGB::new(0.7, 0.1, 0.25);
+
+        assert_eq!(c1 - c2, ColorRGB::new(0.2, 0.5, 0.5));
+        assert_eq!(c2 - c1, ColorRGB::new(-0.2, -0.5, -0.5));
+    }
+
+    #[test]
+    fn scale_multiply_colors_rgb() {
+        let c = ColorRGB::new(0.2, 0.3, 0.4);
+
+        assert_eq!(2.0 * c, ColorRGB::new(0.4, 0.6, 0.8));
+        assert_eq!(c * 2.0, 2.0 * c);
+
+        assert_eq!(-0.5 * c, ColorRGB::new(-0.1, -0.15, -0.2));
+        assert_eq!(c * -0.5, -0.5 * c);
+    }
+
+    #[test]
+    fn scale_divide_colors_rgb() {
+        let c = ColorRGB::new(0.2, 0.3, 0.4);
+
+        assert_eq!(c / 2.0, ColorRGB::new(0.1, 0.15, 0.2));
+        assert_eq!(c / -0.5, ColorRGB::new(-0.4, -0.6, -0.8));
+    }
+
+    #[test]
+    fn multiply_colors_rgb() {
+        let c1 = ColorRGB::new(1.0, 0.2, 0.4);
+        let c2 = ColorRGB::new(0.9, 1.0, 0.1);
+
+        assert_eq!(c1 * c2, ColorRGB::new(0.9, 0.2, 0.04));
+        assert_eq!(c1 * c2, c2 * c1);
     }
 }
 
