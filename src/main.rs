@@ -1,4 +1,4 @@
-use rayla::{Point, Tuple, Vector};
+use rayla::math::{Point, Tuple, Vector};
 
 fn main() {
     let v = Vector::new(1.0, -2.0, 3.0);

@@ -1,4 +1,4 @@
-use rayla::{Point, Vector};
+use rayla::math::{Point, Vector};
 
 fn main() {
     // projectile starts one unit above the origin
