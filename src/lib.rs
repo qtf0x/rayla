@@ -34,6 +34,18 @@ impl Canvas {
 
         self.pixels.get_mut(width * y + x)
     }
+
+    pub fn write(&mut self, x: u16, y: u16, color: ColorRGB) {
+        let Some(pixel) = self.get_mut(x, y) else {
+            return; // does nothing if index out of bounds
+        };
+
+        *pixel = color;
+    }
+
+    pub fn clear(&mut self, color: ColorRGB) {
+        self.pixels.fill(color);
+    }
 }
 
 #[cfg(test)]
@@ -51,10 +63,8 @@ mod tests {
         assert_eq!(c.width, w);
         assert_eq!(c.height, h);
 
-        for x in 0..w {
-            for y in 0..h {
-                assert_eq!(*c.get(x, y).unwrap(), black);
-            }
+        for (x, y) in (0..w).zip(0..h) {
+            assert_eq!(*c.get(x, y).unwrap(), black);
         }
 
         std::assert_matches!(c.get(w + 1, h + 1), None);
@@ -78,14 +88,12 @@ mod tests {
         let black = ColorRGB::default();
         let red = ColorRGB::new(1.0, 0.0, 0.0);
 
-        *c.get_mut(150, 300).unwrap() = red;
+        c.write(150, 300, red);
 
-        for x in 0..w {
-            for y in 0..h {
-                match (x, y) {
-                    (150, 300) => assert_eq!(*c.get(x, y).unwrap(), red),
-                    _ => assert_eq!(*c.get(x, y).unwrap(), black),
-                }
+        for (x, y) in (0..w).zip(0..h) {
+            match (x, y) {
+                (150, 300) => assert_eq!(*c.get(x, y).unwrap(), red),
+                _ => assert_eq!(*c.get(x, y).unwrap(), black),
             }
         }
     }
