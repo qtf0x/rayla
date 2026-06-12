@@ -1,4 +1,5 @@
 // Re-exported modules
+pub mod encode;
 pub mod math;
 
 use crate::math::ColorRGB;
