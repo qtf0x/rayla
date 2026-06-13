@@ -109,12 +109,12 @@ impl ImageEncoder for PpmEncoder {
                     PnmEncoding::Binary => match self.color_depth {
                         PnmColorDepth::EightBpc => &[r as u8, g as u8, b as u8] as &[u8],
                         PnmColorDepth::SixteenBpc => &[
-                            (r.to_be() >> 0x01) as u8,
-                            (r.to_be() & 0x0F) as u8,
-                            (g.to_be() >> 0x01) as u8,
-                            (g.to_be() & 0x0F) as u8,
-                            (b.to_be() >> 0x01) as u8,
-                            (b.to_be() & 0x0F) as u8,
+                            (r >> 0x01) as u8,
+                            (r & 0x0F) as u8,
+                            (g >> 0x01) as u8,
+                            (g & 0x0F) as u8,
+                            (b >> 0x01) as u8,
+                            (b & 0x0F) as u8,
                         ] as &[u8],
                     },
                 };

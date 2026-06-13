@@ -6,10 +6,7 @@ use std::{
 
 use rayla::{
     Canvas,
-    encode::{
-        ImageEncoder,
-        netpbm::{PnmColorDepth, PnmEncoding, PpmEncoder},
-    },
+    encode::{ImageEncoder, netpbm::PpmEncoder},
     math::{ColorRGB, Point, Vector},
 };
 
