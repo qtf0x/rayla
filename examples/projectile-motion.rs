@@ -6,7 +6,10 @@ use std::{
 
 use rayla::{
     Canvas,
-    encode::{ImageEncoder, PpmEncoder},
+    encode::{
+        ImageEncoder,
+        netpbm::{PnmColorDepth, PnmEncoding, PpmEncoder},
+    },
     math::{ColorRGB, Point, Vector},
 };
 
@@ -50,7 +53,7 @@ fn main() -> io::Result<()> {
     }
 
     let mut file = File::create(dir.join("projectile.ppm"))?;
-    PpmEncoder::plain().encode(&canvas, &mut file)?;
+    PpmEncoder::raw().encode(&canvas, &mut file)?;
 
     Ok(())
 }
