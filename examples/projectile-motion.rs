@@ -1,6 +1,6 @@
 use std::{
     fs::{self, File},
-    io,
+    io::{self, BufWriter},
     path::Path,
 };
 
@@ -49,10 +49,8 @@ fn main() -> io::Result<()> {
         fs::create_dir(dir)?;
     }
 
-    let mut file = File::create(dir.join("projectile.ppm"))?;
-    PpmEncoder::raw().encode(&canvas, &mut file)?;
-
-    Ok(())
+    let mut file = BufWriter::new(File::create(dir.join("projectile.ppm"))?);
+    PpmEncoder::raw().encode(&canvas, &mut file)
 }
 
 struct Environment {
