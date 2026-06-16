@@ -63,14 +63,33 @@ impl ImageEncoder for PgmEncoder {
     }
 }
 
+fn num_digits(n: u16) -> u8 {
+    match n {
+        0..=9 => 1,
+        10..=99 => 2,
+        100..=999 => 3,
+        1_000..=9_999 => 4,
+        _ => 5,
+    }
+}
+
 impl ImageEncoder for PpmEncoder {
     fn encode(&self, canvas: &Canvas, writer: &mut impl Write) -> io::Result<()> {
+        if canvas.pixels.is_empty() {
+            return Err(Error::new(
+                ErrorKind::Other,
+                "Canvas has no pixels to encode.",
+            ));
+        }
+
         let max_channel_val: u16 = match self.color_depth {
             PnmColorDepth::EightBpc => 255,
             PnmColorDepth::SixteenBpc => 65_535,
         };
 
-        let header = format!(
+        // Write image header
+        write!(
+            writer,
             "P{}\n{} {}\n{}\n",
             match self.encoding {
                 PnmEncoding::Ascii => '3',
@@ -79,55 +98,53 @@ impl ImageEncoder for PpmEncoder {
             canvas.width,
             canvas.height,
             max_channel_val
-        );
-        writer.write_all(header.as_bytes())?;
+        )?;
 
-        for y in 0..canvas.height {
-            let mut line_len = 0;
+        // Write image raster
+        let mut raster = canvas
+            .pixels
+            .iter()
+            .flat_map(|color| [color.r, color.g, color.b])
+            .map(|sample| (sample.clamp(0.0, 1.0) * max_channel_val as Real).round() as u16);
 
-            for x in 0..canvas.width {
-                let color = canvas.get(x, y).unwrap();
-                let r = (max_channel_val as Real * color.r.clamp(0.0, 1.0)).round() as u16;
-                let g = (max_channel_val as Real * color.g.clamp(0.0, 1.0)).round() as u16;
-                let b = (max_channel_val as Real * color.b.clamp(0.0, 1.0)).round() as u16;
+        match self.encoding {
+            PnmEncoding::Ascii => {
+                let mut bytes_written = 0;
+                let mut line_start = true;
 
-                let color_str = format!("{r} {g} {b} ");
-                let color = match self.encoding {
-                    PnmEncoding::Ascii => {
-                        let color = color_str.as_bytes();
+                raster.try_for_each(|sample| -> io::Result<()> {
+                    let digits = num_digits(sample) + 1;
+                    bytes_written += digits;
 
-                        // limit line length to 70 columns
-                        let color_len = color.len();
-                        if line_len + color_len > 70 {
-                            writer.write_all(&[b'\n'])?;
-                            line_len = 0;
-                        }
-                        line_len += color_len;
-
-                        color
+                    // Minimize whitespace while limiting lines to 70 bytes
+                    if bytes_written > 70 {
+                        bytes_written = digits;
+                        write!(writer, "\n{sample}")
+                    } else if bytes_written == 70 {
+                        bytes_written = 0;
+                        line_start = true;
+                        write!(writer, " {sample}\n")
+                    } else if line_start {
+                        line_start = false;
+                        write!(writer, "{sample}")
+                    } else {
+                        write!(writer, " {sample}")
                     }
-                    PnmEncoding::Binary => match self.color_depth {
-                        PnmColorDepth::EightBpc => &[r as u8, g as u8, b as u8] as &[u8],
-                        PnmColorDepth::SixteenBpc => &[
-                            (r >> 0x01) as u8,
-                            (r & 0x0F) as u8,
-                            (g >> 0x01) as u8,
-                            (g & 0x0F) as u8,
-                            (b >> 0x01) as u8,
-                            (b & 0x0F) as u8,
-                        ] as &[u8],
-                    },
-                };
-
-                writer.write_all(color)?;
+                })
             }
 
-            if self.encoding == PnmEncoding::Ascii {
-                writer.write_all(&[b'\n'])?;
-            }
-        }
+            PnmEncoding::Binary => match self.color_depth {
+                PnmColorDepth::EightBpc => raster
+                    .try_for_each(|sample| -> io::Result<()> { writer.write_all(&[sample as u8]) }),
 
-        Ok(())
+                PnmColorDepth::SixteenBpc => raster.try_for_each(|sample| -> io::Result<()> {
+                    writer.write_all(&sample.to_be_bytes())
+                }),
+            },
+        }?;
+
+        // Some parsers require a final newline in PPM files
+        writer.write_all(b"\n")
     }
 }
 
