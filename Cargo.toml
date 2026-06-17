@@ -2,7 +2,7 @@
 name = "rayla"
 version = "0.1.0"
 edition = "2024"
-license = "AGPL-3.0-only"
+license = "AGPL-3.0-or-later"
 description = "Software renderer with nothing to lose."
 repository = "https://github.com/qtf0x/rayla/"
 keywords = ["ray-tracing", "3d"]
