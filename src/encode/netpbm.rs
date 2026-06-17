@@ -16,8 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Rayla.  If not, see <https://www.gnu.org/licenses/>. */
 
-/// Netpbm image format encoders
-///
+//! Netpbm graphics formats.
+//!
+//! Specifications taken from the offical
+//! [Netpbm man pages](https://netpbm.sourceforge.net/doc/#formats).
+
 use crate::{Canvas, encode::ImageEncoder, math::Real};
 use std::io::{self, Error, ErrorKind, Write};
 

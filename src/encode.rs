@@ -16,11 +16,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Rayla.  If not, see <https://www.gnu.org/licenses/>. */
 
+//! Image serialization facilities and supported formats.
+
+// Exported submodules
 pub mod netpbm;
 
 use crate::Canvas;
 use std::io::{self, Write};
 
+/// Types that knows how to encode pixel data in some storage format.
+///
+/// Implementors ("encoders") are usually structs storing format parameters (e.g., color depth,
+/// compression ratio).
 pub trait ImageEncoder {
     fn encode(&self, canvas: &Canvas, writer: &mut impl Write) -> io::Result<()>;
 }

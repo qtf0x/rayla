@@ -16,10 +16,34 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with Rayla.  If not, see <https://www.gnu.org/licenses/>. */
 
+//! Mathematical structures and operations for 3D rendering.
+
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
+/// Floating-point type determining precision of all internal operations.
 pub type Real = f64;
 
+/// Types which conceptually respect an
+/// [equivalence relation](https://en.wikipedia.org/wiki/Equivalence_relation), but which have an
+/// imprecise machine representation.
+///
+/// Generally, these types are subsets of uncountable sets; for example, floating-point types like
+/// [`f32`](https://doc.rust-lang.org/std/primitive.f32.html) and
+/// [`f64`](https://doc.rust-lang.org/std/primitive.f64.html) conceptually represent the real
+/// numbers ℝ, but are of course really only the subsets of ℝ representable by the respective IEEE
+/// 754-2008 types. A literal equality relation comparing the bit representations of these numbers
+/// is simple, but often not what we want. Due to the imprecision inherent in representing most (in
+/// the limit, *all*) real numbers in this way, calculations that ought to result in the same
+/// *exact* value will often instead have different floating-point values, depending on the
+/// implementation details and handling of intermediate values. In these cases, we would rather have
+/// a way to compare these values for *approximate* equality, within some arbitrary error bound
+/// deemed fit for a specific application.
+///
+/// This trait is modeled after
+/// [`std::cmp::PartialEq`](https://doc.rust-lang.org/std/cmp/trait.PartialEq.html). If Rust allowed
+/// for arbitrary operator overloading, it might further provide analogous operators like `~~` and
+/// `!~`. Like `PartialEq`, the relations represented by `ApproxEq` are *not* necessarily reflexive
+/// (thank you, `NaN`).
 pub trait ApproxEq<Rhs = Self>
 where
     Rhs: ?Sized,
@@ -37,6 +61,7 @@ impl ApproxEq for Real {
     }
 }
 
+/// Four packed real number values. Not a four-dimensional vector.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Tuple {
     x: Real,
@@ -138,12 +163,16 @@ impl Div<Real> for Tuple {
     }
 }
 
+/// Euclidean to [projective](https://en.wikipedia.org/wiki/Homogeneous_coordinates) (homogenous)
+/// coordinates.
 impl From<Point> for Tuple {
     fn from(p: Point) -> Self {
         Self::new(p.x, p.y, p.z, 1.0)
     }
 }
 
+/// Euclidean to [projective](https://en.wikipedia.org/wiki/Homogeneous_coordinates) (homogenous)
+/// coordinates.
 impl From<Vector> for Tuple {
     fn from(v: Vector) -> Self {
         Self::new(v.x, v.y, v.z, 0.0)
@@ -155,6 +184,7 @@ pub enum TupleConversionError {
     BadWValue(Real),
 }
 
+/// Element of a three-dimensional, real-valued color (vector) space.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct ColorRGB {
     pub r: Real,
@@ -200,6 +230,8 @@ impl Sub for ColorRGB {
     }
 }
 
+/// Performs element-wise
+/// ([Hadamard/Shur](https://en.wikipedia.org/wiki/Hadamard_product_(matrices))) product.
 impl Mul for ColorRGB {
     type Output = Self;
 
@@ -248,6 +280,7 @@ impl Div<Real> for ColorRGB {
     }
 }
 
+/// Position in three-dimensional Euclidean space.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Point {
     pub x: Real,
@@ -308,6 +341,12 @@ impl Sub<Vector> for Point {
 impl TryFrom<Tuple> for Point {
     type Error = TupleConversionError;
 
+    /// Attempt to interpret tuple as a position in projective space.
+    ///
+    /// ## Errors
+    ///
+    /// Returns [`TupleConversionError::BadWValue`] if the fourth element of the tuple is not
+    /// (approximately) equal to one. Error contains the offending *w* value.
     fn try_from(t: Tuple) -> Result<Self, Self::Error> {
         if Real::approx_eq(&t.w, &1.0) {
             Ok(Self::new(t.x, t.y, t.z))
@@ -317,6 +356,7 @@ impl TryFrom<Tuple> for Point {
     }
 }
 
+/// Three-dimensional Euclidean vector.
 #[derive(Clone, Copy, Debug, Default)]
 pub struct Vector {
     x: Real,
@@ -456,6 +496,12 @@ impl Div<Real> for Vector {
 impl TryFrom<Tuple> for Vector {
     type Error = TupleConversionError;
 
+    /// Attempt to interpret tuple as a vector in projective space.
+    ///
+    /// ## Errors
+    ///
+    /// Returns [`TupleConversionError::BadWValue`] if the fourth element of the tuple is not
+    /// (approximately) equal to zero. Error contains the offending *w* value.
     fn try_from(t: Tuple) -> Result<Self, Self::Error> {
         if Real::approx_eq(&t.w, &0.0) {
             Ok(Self::new(t.x, t.y, t.z))
