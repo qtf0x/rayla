@@ -29,8 +29,9 @@
 //! - [*Real-Time Rendering*](https://www.realtimerendering.com/) by Tomas Akenine-Möller, Eric
 //! Haines, Naty Hoffman, Angelo Pesce, Michał Iwanicki, and Sébastien Hillaire
 //!
-//! <img src= "https://upload.wikimedia.org/wikipedia/commons/0/06/AGPLv3_Logo.svg"
-//! alt="GNU AGPLv3 Logo" title="GNU Affero General Public License" width="150"/>
+//! <a href="https://www.gnu.org/licenses/agpl-3.0.html"><img
+//! src= "https://upload.wikimedia.org/wikipedia/commons/0/06/AGPLv3_Logo.svg" alt="GNU AGPLv3 Logo"
+//! title="GNU Affero General Public License" width="150"/></a>
 
 // Exported modules
 pub mod encode;
