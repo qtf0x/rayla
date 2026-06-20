@@ -1,5 +1,3 @@
-# Crate rayla
-
 A ray tracing library and application framework.
 
 Rayla provides types and routines for sythesizing images of 3D scenes via the
