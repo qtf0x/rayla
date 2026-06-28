@@ -22,7 +22,7 @@ pub mod netpbm;
 use crate::Canvas;
 use std::io::{self, Write};
 
-/// Types that knows how to encode pixel data in some storage format.
+/// Types that know how to encode pixel data in some storage format.
 ///
 /// Implementors ("encoders") are usually structs storing format parameters (e.g., color depth,
 /// compression ratio).

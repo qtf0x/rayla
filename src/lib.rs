@@ -24,7 +24,7 @@
 //! ## References
 //!
 //! - [*The Ray Tracer Challenge*](http://raytracerchallenge.com/) by Jamis Buck
-//! - The [*Ray Tracing in One Weekend*](https://raytracing.github.io/) series by Shirley,
+//! - The [*Ray Tracing in One Weekend*](https://raytracing.github.io/) series by Peter Shirley,
 //! Trevor D Black, and Steve Hollasch
 //! - [*Real-Time Rendering*](https://www.realtimerendering.com/) by Tomas Akenine-Möller, Eric
 //! Haines, Naty Hoffman, Angelo Pesce, Michał Iwanicki, and Sébastien Hillaire
