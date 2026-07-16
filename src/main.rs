@@ -14,8 +14,12 @@
  * You should have received a copy of the GNU Affero General Public License along with Rayla. If
  * not, see <https://www.gnu.org/licenses/>. */
 
-use rayla::math::{self, Matrix4, Point, Vector};
+use rayla::math::{self, Matrix4, Point, Real, Vector};
+#[cfg(not(feature = "single-precision"))]
 use std::f64::consts::TAU;
+
+#[cfg(feature = "single-precision")]
+use std::f32::consts::TAU;
 
 fn main() {
     let v = Vector::new(1.0, -2.0, 3.0);
@@ -29,7 +33,7 @@ fn main() {
 
     println!("\nClock face (looking down the y axis):");
     for hour in 0..12 {
-        let rotate = math::rotation_y(hour as f64 * TAU / 12.0);
+        let rotate = math::rotation_y(hour as Real * TAU / 12.0);
         let position = (to_screen * rotate) * twelve;
 
         println!("  {:>2}h -> {:?}", hour, position);

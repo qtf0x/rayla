@@ -8,4 +8,7 @@ repository = "https://github.com/qtf0x/rayla/"
 keywords = ["ray-tracing", "3d"]
 categories = ["game-development", "graphics", "multimedia", "multimedia::images", "rendering"]
 
+[features]
+single-precision = []
+
 [dependencies]

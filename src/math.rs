@@ -19,7 +19,11 @@
 use std::ops::{Add, Div, Mul, Neg, Sub};
 
 /// Floating-point type determining precision of all internal operations.
+#[cfg(not(feature = "single-precision"))]
 pub type Real = f64;
+
+#[cfg(feature = "single-precision")]
+pub type Real = f32;
 
 /// Types which conceptually respect an
 /// [equivalence relation](https://en.wikipedia.org/wiki/Equivalence_relation), but which have an
@@ -1118,7 +1122,11 @@ mod doctests {
 #[cfg(test)]
 mod matrix_tests {
     use super::*;
+    #[cfg(not(feature = "single-precision"))]
     use std::f64::consts::{FRAC_1_SQRT_2, FRAC_PI_2, FRAC_PI_4};
+
+    #[cfg(feature = "single-precision")]
+    use std::f32::consts::{FRAC_1_SQRT_2, FRAC_PI_2, FRAC_PI_4};
 
     #[test]
     fn construct_and_inspect() {
